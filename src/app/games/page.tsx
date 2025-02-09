@@ -1,3 +1,3 @@
 export default function Page() {
-	return <h1>Index page</h1>;
+	return <h1>Game List</h1>;
 }
