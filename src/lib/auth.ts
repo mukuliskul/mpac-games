@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { supabase } from "./supabase";
 
 export const authOptions = {
 	providers: [
@@ -15,27 +16,41 @@ export const authOptions = {
 				password: { label: "Password", type: "password" },
 			},
 			async authorize(credentials) {
-				// Mock user data (Replace this with DB fetch)
-				const user = {
-					id: "1",
-					email: "test@example.com",
-					password: "$2a$10$hashedPassword",
-				};
+				if (!credentials?.email || !credentials?.password) {
+					throw new Error("Missing email or password");
+				}
 
-				if (
-					!user ||
-					!(await bcrypt.compare(credentials.password, user.password))
-				) {
+				// Fetch user from the `players` table
+				const { data: player, error } = await supabase
+					.from("players")
+					.select("*")
+					.eq("email", credentials.email)
+					.single();
+
+				if (error || !player) {
+					throw new Error("Player not found");
+				}
+
+				// Compare passwords
+				const isValidPassword = await bcrypt.compare(
+					credentials.password,
+					player.password
+				);
+				if (!isValidPassword) {
 					throw new Error("Invalid credentials");
 				}
 
-				return user;
+				return { id: player.id, email: player.email };
 			},
 		}),
 	],
 	pages: {
 		signIn: "/login",
 	},
+	session: {
+		strategy: "jwt",
+	},
+	secret: process.env.NEXTAUTH_SECRET,
 };
 
 const handler = NextAuth(authOptions);
