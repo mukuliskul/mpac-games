@@ -20,10 +20,10 @@ export const authOptions = {
 					throw new Error("Missing email or password");
 				}
 
-				// Fetch user from the `players` table
+				// Fetch player from the `players` table
 				const { data: player, error } = await supabase
 					.from("players")
-					.select("*")
+					.select("id, email, username, password")
 					.eq("email", credentials.email)
 					.single();
 
@@ -40,7 +40,11 @@ export const authOptions = {
 					throw new Error("Invalid credentials");
 				}
 
-				return { id: player.id, email: player.email };
+				return {
+					id: player.id,
+					email: player.email,
+					username: player.username,
+				};
 			},
 		}),
 	],
@@ -49,6 +53,22 @@ export const authOptions = {
 	},
 	session: {
 		strategy: "jwt",
+	},
+	callbacks: {
+		async jwt({ token, user }) {
+			if (user) {
+				token.id = user.id;
+				token.username = user.username;
+			}
+			return token;
+		},
+		async session({ session, token }) {
+			if (session.user) {
+				session.user.id = token.id;
+				session.user.username = token.username;
+			}
+			return session;
+		},
 	},
 	secret: process.env.NEXTAUTH_SECRET,
 };

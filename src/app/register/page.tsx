@@ -1,44 +1,107 @@
-import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import { supabase } from "@/lib/supabase";
+"use client";
 
-export async function POST(req: Request) {
-	try {
-		const { email, password } = await req.json();
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
 
-		// Check if player already exists
-		const { data: existingPlayer } = await supabase
-			.from("players")
-			.select("id")
-			.eq("email", email)
-			.single();
+const registerSchema = z
+	.object({
+		email: z.string().email(),
+		password: z.string().min(6, "Password must be at least 6 characters"),
+		confirmPassword: z.string(),
+	})
+	.refine((data) => data.password === data.confirmPassword, {
+		message: "Passwords do not match",
+		path: ["confirmPassword"],
+	});
 
-		if (existingPlayer) {
-			return NextResponse.json(
-				{ error: "Player already exists" },
-				{ status: 400 }
-			);
+export default function RegisterPage() {
+	const router = useRouter();
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm({
+		resolver: zodResolver(registerSchema),
+	});
+
+	const [error, setError] = useState<string | null>(null);
+
+	const onSubmit = async (data: { email: string; password: string }) => {
+		try {
+			// TODO: Handle registration logic (API call)
+			console.log("User registered:", data);
+			router.push("/login");
+		} catch (err) {
+			setError("Registration failed");
 		}
+	};
 
-		// Hash password
-		const hashedPassword = await bcrypt.hash(password, 10);
-
-		// Insert player into Supabase
-		const { data, error } = await supabase
-			.from("players")
-			.insert([{ email, password: hashedPassword }])
-			.select()
-			.single();
-
-		if (error) {
-			throw error;
-		}
-
-		return NextResponse.json({ player: data }, { status: 201 });
-	} catch (error) {
-		return NextResponse.json(
-			{ error: "Error registering player" },
-			{ status: 500 }
-		);
-	}
+	return (
+		<div className="flex justify-center items-center min-h-screen">
+			<Card className="w-96">
+				<CardHeader>
+					<CardTitle>Register</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+						<div>
+							<Label>Email</Label>
+							<Input
+								{...register("email")}
+								type="email"
+								placeholder="example@example.com"
+							/>
+							{errors.email && (
+								<p className="text-red-500 text-sm">{errors.email.message}</p>
+							)}
+						</div>
+						<div>
+							<Label>Password</Label>
+							<Input
+								{...register("password")}
+								type="password"
+								placeholder="••••••••"
+							/>
+							{errors.password && (
+								<p className="text-red-500 text-sm">
+									{errors.password.message}
+								</p>
+							)}
+						</div>
+						<div>
+							<Label>Confirm Password</Label>
+							<Input
+								{...register("confirmPassword")}
+								type="password"
+								placeholder="••••••••"
+							/>
+							{errors.confirmPassword && (
+								<p className="text-red-500 text-sm">
+									{errors.confirmPassword.message}
+								</p>
+							)}
+						</div>
+						{error && <p className="text-red-500 text-sm">{error}</p>}
+						<Button type="submit" className="w-full">
+							Register
+						</Button>
+					</form>
+					<p className="mt-2 text-sm text-center">
+						Already have an account?{" "}
+						<Link href="/login" className="text-blue-500">
+							Log in
+						</Link>
+					</p>
+				</CardContent>
+			</Card>
+		</div>
+	);
 }
