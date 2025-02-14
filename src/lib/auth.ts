@@ -52,17 +52,17 @@ export const authOptions = {
 		signIn: "/login",
 	},
 	session: {
-		strategy: "jwt",
+		strategy: "jwt" as const,
 	},
 	callbacks: {
-		async jwt({ token, user }) {
+		async jwt({ token, user }: { token: any; user?: any }) {
 			if (user) {
 				token.id = user.id;
 				token.username = user.username;
 			}
 			return token;
 		},
-		async session({ session, token }) {
+		async session({ session, token }: { session: any; token: any }) {
 			if (session.user) {
 				session.user.id = token.id;
 				session.user.username = token.username;

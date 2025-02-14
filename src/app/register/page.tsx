@@ -11,9 +11,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 
+//TODO: make a register component
 const registerSchema = z
 	.object({
 		email: z.string().email(),
+		username: z.string().min(3, "Username must be at least 3 characters"),
 		password: z.string().min(6, "Password must be at least 6 characters"),
 		confirmPassword: z.string(),
 	})
@@ -28,19 +30,37 @@ export default function RegisterPage() {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm({
+	} = useForm<{
+		email: string;
+		username: string;
+		password: string;
+		confirmPassword: string;
+	}>({
 		resolver: zodResolver(registerSchema),
 	});
 
 	const [error, setError] = useState<string | null>(null);
 
-	const onSubmit = async (data: { email: string; password: string }) => {
+	const onSubmit = async (data: {
+		email: string;
+		username: string;
+		password: string;
+	}) => {
 		try {
-			// TODO: Handle registration logic (API call)
-			console.log("User registered:", data);
+			const response = await fetch("/api/register", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data),
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.message || "Registration failed");
+			}
+
 			router.push("/login");
-		} catch (err) {
-			setError("Registration failed");
+		} catch (err: any) {
+			setError(err.message || "Registration failed");
 		}
 	};
 
@@ -54,22 +74,23 @@ export default function RegisterPage() {
 					<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 						<div>
 							<Label>Email</Label>
-							<Input
-								{...register("email")}
-								type="email"
-								placeholder="example@example.com"
-							/>
+							<Input {...register("email")} type="email" />
 							{errors.email && (
 								<p className="text-red-500 text-sm">{errors.email.message}</p>
 							)}
 						</div>
 						<div>
+							<Label>Username</Label>
+							<Input {...register("username")} type="username" />
+							{errors.username && (
+								<p className="text-red-500 text-sm">
+									{errors.username.message}
+								</p>
+							)}
+						</div>
+						<div>
 							<Label>Password</Label>
-							<Input
-								{...register("password")}
-								type="password"
-								placeholder="••••••••"
-							/>
+							<Input {...register("password")} type="password" />
 							{errors.password && (
 								<p className="text-red-500 text-sm">
 									{errors.password.message}
@@ -78,11 +99,7 @@ export default function RegisterPage() {
 						</div>
 						<div>
 							<Label>Confirm Password</Label>
-							<Input
-								{...register("confirmPassword")}
-								type="password"
-								placeholder="••••••••"
-							/>
+							<Input {...register("confirmPassword")} type="password" />
 							{errors.confirmPassword && (
 								<p className="text-red-500 text-sm">
 									{errors.confirmPassword.message}
