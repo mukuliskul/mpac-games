@@ -23,24 +23,30 @@ export default function LoginPage() {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm({
+	} = useForm<{ email: string; password: string }>({
 		resolver: zodResolver(loginSchema),
 	});
 
 	const [error, setError] = useState<string | null>(null);
 
 	const onSubmit = async (data: { email: string; password: string }) => {
-		const result = await signIn("credentials", {
-			redirect: false,
-			email: data.email,
-			password: data.password,
+		const res = await fetch("/api/login", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(data),
 		});
 
-		if (result?.error) {
-			setError("Invalid credentials");
-		} else {
-			router.push("/dashboard");
+		const result = await res.json();
+
+		if (!res.ok) {
+			setError(result.error || "Login failed");
+			return;
 		}
+
+		// Save token in localStorage or Context (for authentication)
+		localStorage.setItem("token", result.token);
+
+		router.push("/games");
 	};
 
 	return (
@@ -53,22 +59,14 @@ export default function LoginPage() {
 					<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 						<div>
 							<Label>Email</Label>
-							<Input
-								{...register("email")}
-								type="email"
-								placeholder="example@example.com"
-							/>
+							<Input {...register("email")} type="email" />
 							{errors.email && (
 								<p className="text-red-500 text-sm">{errors.email.message}</p>
 							)}
 						</div>
 						<div>
 							<Label>Password</Label>
-							<Input
-								{...register("password")}
-								type="password"
-								placeholder="••••••••"
-							/>
+							<Input {...register("password")} type="password" />
 							{errors.password && (
 								<p className="text-red-500 text-sm">
 									{errors.password.message}

@@ -14,8 +14,9 @@ export async function POST(req: Request) {
 			.single();
 
 		if (existingPlayer) {
+			console.log("Player exists");
 			return NextResponse.json(
-				{ error: "Player already exists" },
+				{ message: "Email already exists" },
 				{ status: 400 }
 			);
 		}
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
 
 		if (existingUsername) {
 			return NextResponse.json(
-				{ error: "Username already taken" },
+				{ message: "Username already taken" },
 				{ status: 400 }
 			);
 		}
@@ -48,10 +49,15 @@ export async function POST(req: Request) {
 			throw error;
 		}
 
-		return NextResponse.json({ player: data }, { status: 201 });
-	} catch (error) {
 		return NextResponse.json(
-			{ error: "Error registering player" },
+			{ player: data, message: "User registered successfully" },
+			{ status: 201 }
+		);
+	} catch (error: any) {
+		console.error("Registration Error:", error.message);
+
+		return NextResponse.json(
+			{ error: error.message || "Error registering player" },
 			{ status: 500 }
 		);
 	}
