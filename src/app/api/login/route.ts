@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 			);
 		}
 
-		// Generate JWT token (or use NextAuth session)
+		// Generate JWT token
 		const token = signJwt({
 			id: user.id,
 			email: user.email,

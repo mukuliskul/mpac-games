@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
@@ -19,6 +19,15 @@ const loginSchema = z.object({
 
 export default function LoginPage() {
 	const router = useRouter();
+
+	useEffect(() => {
+		const token = localStorage.getItem("token");
+
+		if (token) {
+			router.push("/games"); // Redirect logged-in users
+		}
+	}, []);
+
 	const {
 		register,
 		handleSubmit,
@@ -59,7 +68,7 @@ export default function LoginPage() {
 					<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 						<div>
 							<Label>Email</Label>
-							<Input {...register("email")} type="email" />
+							<Input {...register("email")} type="email" autoComplete="off" />
 							{errors.email && (
 								<p className="text-red-500 text-sm">{errors.email.message}</p>
 							)}
