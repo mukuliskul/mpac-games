@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -24,9 +23,38 @@ export default function LoginPage() {
 		const token = localStorage.getItem("token");
 
 		if (token) {
-			router.push("/games"); // Redirect logged-in users
+			// Check token validity on the backend
+			verifyTokenOnBackend(token).then((isValid) => {
+				if (!isValid) {
+					localStorage.removeItem("token");
+					window.location.href = "/login"; // Redirect to login if invalid
+				} else {
+					router.push("/games");
+				}
+			});
 		}
 	}, []);
+
+	const verifyTokenOnBackend = async (token: string) => {
+		try {
+			const res = await fetch("/api/verify-token", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ token }),
+			});
+
+			if (res.ok) {
+				const data = await res.json();
+				return data.isValid;
+			}
+			return false;
+		} catch (error) {
+			console.error("Token verification failed:", error);
+			return false;
+		}
+	};
 
 	const {
 		register,
@@ -52,7 +80,7 @@ export default function LoginPage() {
 			return;
 		}
 
-		// Save token in localStorage or Context (for authentication)
+		// Save token in localStorage
 		localStorage.setItem("token", result.token);
 
 		router.push("/games");

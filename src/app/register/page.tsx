@@ -81,7 +81,11 @@ export default function RegisterPage() {
 						</div>
 						<div>
 							<Label>Username</Label>
-							<Input {...register("username")} type="username" />
+							<Input
+								{...register("username")}
+								type="username"
+								autoComplete="off"
+							/>
 							{errors.username && (
 								<p className="text-red-500 text-sm">
 									{errors.username.message}
