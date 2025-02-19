@@ -1,16 +1,12 @@
 import jwt from "jsonwebtoken";
+import { StringValue } from "ms";
 
 const SECRET = process.env.JWT_SECRET!;
 
-export function signJwt(payload: object) {
-	return jwt.sign(payload, SECRET, { expiresIn: "7d" });
+export function signJwt(payload: object, expiresIn: StringValue = "1h") {
+	return jwt.sign(payload, SECRET, { expiresIn: expiresIn });
 }
 
-//TODO: figure out how jwt work
 export function verifyJwt(token: string) {
-	try {
-		return jwt.verify(token, SECRET);
-	} catch (error) {
-		return null; // Invalid token
-	}
+	return jwt.verify(token, SECRET);
 }

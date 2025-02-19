@@ -36,14 +36,30 @@ export async function POST(req: Request) {
 			);
 		}
 
-		// Generate JWT token
-		const token = signJwt({
-			id: user.id,
-			email: user.email,
-			username: user.username,
+		// Generate JWT token (valid for 1 hour)
+		const token = signJwt(
+			{ id: user.id, email: user.email, username: user.username },
+			"1h"
+		);
+
+		// Create a response object
+		const response = NextResponse.json(
+			{
+				success: true,
+				user: { id: user.id, email: user.email, username: user.username },
+			},
+			{ status: 200 }
+		);
+
+		// Set HTTP-only cookie with the JWT
+		response.cookies.set("jwt", token, {
+			httpOnly: true,
+			sameSite: "strict",
+			maxAge: 3600, // 1 hour
+			path: "/",
 		});
 
-		return NextResponse.json({ token, user }, { status: 200 });
+		return response;
 	} catch (error) {
 		return NextResponse.json(
 			{ error: "Internal Server Error" },

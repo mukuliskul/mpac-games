@@ -18,43 +18,26 @@ const loginSchema = z.object({
 
 export default function LoginPage() {
 	const router = useRouter();
+	const [error, setError] = useState<string | null>(null);
 
+	// Check if the user is already logged in (JWT stored in HTTP-only cookies)
 	useEffect(() => {
-		const token = localStorage.getItem("token");
+		const checkAuth = async () => {
+			try {
+				const res = await fetch("/api/auth/me", {
+					credentials: "include", // Include cookies in request
+				});
 
-		if (token) {
-			// Check token validity on the backend
-			verifyTokenOnBackend(token).then((isValid) => {
-				if (!isValid) {
-					localStorage.removeItem("token");
-					window.location.href = "/login"; // Redirect to login if invalid
-				} else {
-					router.push("/games");
+				if (res.ok) {
+					router.push("/games"); // Redirect to dashboard if logged in
 				}
-			});
-		}
-	}, []);
-
-	const verifyTokenOnBackend = async (token: string) => {
-		try {
-			const res = await fetch("/api/verify-token", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ token }),
-			});
-
-			if (res.ok) {
-				const data = await res.json();
-				return data.isValid;
+			} catch (error) {
+				console.error("Error verifying authentication:", error);
 			}
-			return false;
-		} catch (error) {
-			console.error("Token verification failed:", error);
-			return false;
-		}
-	};
+		};
+
+		checkAuth();
+	}, []);
 
 	const {
 		register,
@@ -64,26 +47,21 @@ export default function LoginPage() {
 		resolver: zodResolver(loginSchema),
 	});
 
-	const [error, setError] = useState<string | null>(null);
-
 	const onSubmit = async (data: { email: string; password: string }) => {
-		const res = await fetch("/api/login", {
+		const res = await fetch("/api/auth/login", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(data),
+			credentials: "include", // Ensure cookies are stored
 		});
 
-		const result = await res.json();
-
 		if (!res.ok) {
+			const result = await res.json();
 			setError(result.error || "Login failed");
 			return;
 		}
 
-		// Save token in localStorage
-		localStorage.setItem("token", result.token);
-
-		router.push("/games");
+		router.push("/games"); // Redirect to dashboard
 	};
 
 	return (
