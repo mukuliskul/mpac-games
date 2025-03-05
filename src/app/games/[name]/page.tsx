@@ -14,17 +14,33 @@ export default function GamePage({
 }>) {
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null); // Error state
   const { name } = use(params);
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchGame() {
-      const response = await fetch(`/api/games/${name}`);
-      console.log(response)
-      const data = await response.json();
-      // console.log(data)
-      setGame(data);
-      setLoading(false);
+      try {
+        const response = await fetch(`/api/games/${name}`);
+
+        if (!response.ok) {
+          throw new Error('Game not found');
+        }
+
+        const data = await response.json();
+        setGame(data);
+        setLoading(false);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          // Now TypeScript knows that `err` is an instance of `Error`
+          console.error(err.message);
+          setError('Failed to fetch game details.');
+        } else {
+          console.error('An unexpected error occurred');
+          setError('An unexpected error occurred.');
+        }
+        setLoading(false);
+      }
     }
 
     fetchGame();
@@ -32,6 +48,10 @@ export default function GamePage({
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>; // Display error message
   }
 
   if (!game) {

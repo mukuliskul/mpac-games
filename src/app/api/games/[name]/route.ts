@@ -5,22 +5,22 @@ export async function GET(
   { params }: { params: Promise<{ name: string }> }
 ) {
   const { name } = await params;
-  const { data, error } = await supabase
+
+  const { data, error, count } = await supabase
     .from("games")
-    .select("*")
+    .select("*", { count: "exact" })
     .ilike("name", name)
-    .single();
+    .limit(1); // Limit the results to 1 row
 
   if (error) {
-    console.log(error)
+    console.log(error);
     return new Response("Error fetching data", { status: 500 });
   }
 
-  if (!data) {
-    return new Response("Game not found.", { status: 404 })
+  if (count === 0) {
+    // If no data is found
+    return new Response("Game not found.", { status: 404 });
   }
 
-
-  return new Response(JSON.stringify(data), { status: 200 });
+  return new Response(JSON.stringify(data[0]), { status: 200 });
 }
-
