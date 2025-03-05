@@ -1,28 +1,39 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import GamesGrid from "@/components/GamesGrid";
 
 export default function GamesPage() {
-	const [games, setGames] = useState([]);
+  const [games, setGames] = useState<{ id: number; name: string; desc: string; image_url: string }[]>([]);
+  const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
-		async function fetchGames() {
-			const response = await fetch("/api/games");
-			const data = await response.json();
-			setGames(data);
-		}
+  useEffect(() => {
+    async function fetchGames() {
+      try {
+        const response = await fetch("/api/games");
+        const data = await response.json();
+        setGames(data);
+      } catch (error) {
+        console.error("Error fetching games:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-		fetchGames();
-	}, []);
+    fetchGames();
+  }, []);
 
-	return (
-		<div>
-			<h1 className="text-3xl font-bold">Games List</h1>
-			<ul>
-				{games.map((game: { id: string; name: string }) => (
-					<li key={game.id}>{game.name}</li>
-				))}
-			</ul>
-		</div>
-	);
+  return (
+    <div className="p-6">
+      <h1 className="text-4xl font-bold text-center mb-6">Games List</h1>
+
+      {loading ? (
+        <p className="text-center text-gray-500">Loading games...</p>
+      ) : games.length === 0 ? (
+        <p className="text-center text-gray-500">No games found.</p>
+      ) : (
+        <GamesGrid games={games} />
+      )}
+    </div>
+  );
 }
