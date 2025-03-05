@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import Link from "next/link";
 
 const gradients = [
   "bg-gradient-to-r from-purple-500 to-pink-500",
@@ -13,10 +14,9 @@ const gradients = [
   "bg-gradient-to-r from-indigo-500 to-cyan-500",
 ];
 
-// TODO: add is_active
 const GamesGrid = ({ games }: { games: { id: number; name: string; desc: string; image_url: string }[] }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
       {games.map((game, index) => (
         <motion.div
           key={game.id}
@@ -24,30 +24,31 @@ const GamesGrid = ({ games }: { games: { id: number; name: string; desc: string;
           whileTap={{ scale: 0.95 }}
           className="relative group cursor-pointer"
         >
-          <Card className={cn("rounded-2xl overflow-hidden shadow-lg transition-all duration-300", gradients[index % gradients.length])}>
-            {/* Game Image */}
-            <div className="relative w-full h-60 bg-gray-800">
-              <Image
-                src={game.image_url}
-                alt={game.name}
-                layout="fill"
-                objectFit="cover"
-                className="rounded-t-2xl"
-              />
-            </div>
-            {/* Game Details */}
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold tracking-wide text-white drop-shadow-lg">
-                {game.name}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-white opacity-90">{game.desc}</p>
-            </CardContent>
+          <Link href={`/games/${game.name.toLowerCase()}`} passHref>
+            <Card className={cn("rounded-2xl overflow-hidden shadow-lg transition-all duration-300", gradients[index % gradients.length])}>
+              {/* Game Image */}
+              <div className="relative w-full h-60 bg-gray-800">
+                <Image
+                  src={game.image_url}
+                  alt={game.name}
+                  layout="fill"
+                  objectFit="cover"
+                  className="rounded-t-2xl"
+                />
+              </div>
 
-            {/* Glow Effect */}
-            <div className="absolute -inset-1 rounded-2xl bg-white opacity-10 blur-md transition-all duration-300 group-hover:opacity-20" />
-          </Card>
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold tracking-wide text-white drop-shadow-lg">
+                  {game.name}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-white opacity-90">{game.desc}</p>
+              </CardContent>
+
+              <div className="absolute -inset-1 rounded-2xl bg-white opacity-10 blur-md transition-all duration-300 group-hover:opacity-20" />
+            </Card>
+          </Link>
         </motion.div>
       ))}
     </div>
