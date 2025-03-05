@@ -21,11 +21,11 @@ const GamesGrid = ({ games }: { games: { id: number; name: string; desc: string;
           key={game.id}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="relative group"
+          className="relative group cursor-pointer"
         >
           <Card className={cn("rounded-2xl overflow-hidden shadow-lg transition-all duration-300", gradients[index % gradients.length])}>
             {/* Game Image */}
-            <div className="relative h-full w-full bg-gray-800">
+            <div className="relative w-full h-full bg-gray-800">
               <img
                 src={game.image_url || "/placeholder.png"}
                 alt={game.name}
