@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 const gradients = [
   "bg-gradient-to-r from-purple-500 to-pink-500",
@@ -13,7 +14,7 @@ const gradients = [
 ];
 
 // TODO: add is_active
-const GamesGrid = ({ games }: { games: { id: number; name: string; desc: string; image_url?: string }[] }) => {
+const GamesGrid = ({ games }: { games: { id: number; name: string; desc: string; image_url: string }[] }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {games.map((game, index) => (
@@ -25,14 +26,15 @@ const GamesGrid = ({ games }: { games: { id: number; name: string; desc: string;
         >
           <Card className={cn("rounded-2xl overflow-hidden shadow-lg transition-all duration-300", gradients[index % gradients.length])}>
             {/* Game Image */}
-            <div className="relative w-full h-full bg-gray-800">
-              <img
-                src={game.image_url || "/placeholder.png"}
+            <div className="relative w-full h-60 bg-gray-800">
+              <Image
+                src={game.image_url}
                 alt={game.name}
-                className="object-cover w-full h-full rounded-t-2xl"
+                layout="fill"
+                objectFit="cover"
+                className="rounded-t-2xl"
               />
             </div>
-
             {/* Game Details */}
             <CardHeader>
               <CardTitle className="text-2xl font-bold tracking-wide text-white drop-shadow-lg">
