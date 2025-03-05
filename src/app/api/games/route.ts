@@ -1,12 +1,11 @@
-// src/app/api/games/route.ts
 import { supabase } from "@/lib/supabase";
 
 export async function GET() {
-	const { data, error } = await supabase.from("games").select("*");
+  const { data, error } = await supabase.from("games").select("*");
 
-	if (error) {
-		return new Response("Error fetching data", { status: 500 });
-	}
+  if (error) {
+    return new Response("Error fetching data", { status: 500 });
+  }
 
-	return new Response(JSON.stringify(data), { status: 200 });
+  return new Response(JSON.stringify(data), { status: 200 });
 }

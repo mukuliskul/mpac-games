@@ -24,9 +24,8 @@ const GamesGrid = ({ games }: { games: { id: number; name: string; desc: string;
           whileTap={{ scale: 0.95 }}
           className="relative group cursor-pointer"
         >
-          <Link href={`/games/${game.name.toLowerCase()}`} passHref>
+          <Link href={`/games/${game.name.toLowerCase().replace(/\s+/g, '-')}`} passHref>
             <Card className={cn("rounded-2xl overflow-hidden shadow-lg transition-all duration-300", gradients[index % gradients.length])}>
-              {/* Game Image */}
               <div className="relative w-full h-60 bg-gray-800">
                 <Image
                   src={game.image_url}
@@ -36,7 +35,6 @@ const GamesGrid = ({ games }: { games: { id: number; name: string; desc: string;
                   className="rounded-t-2xl"
                 />
               </div>
-
               <CardHeader>
                 <CardTitle className="text-2xl font-bold tracking-wide text-white drop-shadow-lg">
                   {game.name}
