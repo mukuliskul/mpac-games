@@ -4,5 +4,5 @@ export interface Game {
   description: string;
   image_url: string;
   rules: string;
-  type: string;
+  modes: string;
 }

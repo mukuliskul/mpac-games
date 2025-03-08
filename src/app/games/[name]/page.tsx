@@ -14,7 +14,7 @@ export default function GamePage({
 }>) {
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null); // Error state
+  const [error, setError] = useState<string | null>(null);
   const { name } = use(params);
   const router = useRouter();
 
@@ -32,11 +32,8 @@ export default function GamePage({
         setLoading(false);
       } catch (err: unknown) {
         if (err instanceof Error) {
-          // Now TypeScript knows that `err` is an instance of `Error`
-          console.error(err.message);
           setError('Failed to fetch game details.');
         } else {
-          console.error('An unexpected error occurred');
           setError('An unexpected error occurred.');
         }
         setLoading(false);
@@ -51,7 +48,7 @@ export default function GamePage({
   }
 
   if (error) {
-    return <div>{error}</div>; // Display error message
+    return <div>{error}</div>;
   }
 
   if (!game) {
@@ -69,35 +66,27 @@ export default function GamePage({
         <p className="text-lg">{game.description}</p>
       </Card>
 
-      {/* Game Rules */}
-      {game.rules && (
-        <Card className="mb-6 p-4">
-          <h2 className="text-2xl font-semibold">Rules</h2>
-          <p className="text-lg">{game.rules}</p>
-        </Card>
-      )}
-
       {/* Action Buttons */}
       <div className="flex justify-between mb-6">
         <Button
-          onClick={() => router.push(`/leaderboard/${game.name.toLowerCase().replace(/\s+/g, '-')}`)}
+          onClick={() => router.push(`/games/${game.name.toLowerCase().replace(/\s+/g, '-')}/leaderboard`)}
           className="w-1/2 mr-2"
         >
           View Leaderboard
         </Button>
 
         <Button
-          onClick={() => router.push(`/enroll/${game.name.toLowerCase().replace(/\s+/g, '-')}`)}
+          onClick={() => router.push(`/games/${game.name.toLowerCase().replace(/\s+/g, '-')}/enroll`)}
           className="w-1/2"
         >
           Enroll
         </Button>
       </div>
 
-      {game.type && (
+      {game.modes && (
         <Card className="mb-6 p-4">
-          <h2 className="text-2xl font-semibold">Game Type</h2>
-          <p className="text-lg">{game.type}</p>
+          <h2 className="text-2xl font-semibold">Game Modes:</h2>
+          <p className="text-lg">{game.modes}</p>
         </Card>
       )}
     </div>
