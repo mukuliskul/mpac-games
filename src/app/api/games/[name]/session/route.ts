@@ -5,15 +5,16 @@ export async function GET(
   { params }: { params: Promise<{ name: string }> }
 ) {
   const { name } = await params;
+  const formattedName = name.replace(/-/g, " ");
 
-  const { data, error } = await supabase
-    .from("game-sessions")
+  const { data: game_sessions, error } = await supabase
+    .from('game_sessions')
     .select("*")
-    .ilike("name", name)
+    .ilike('game_name', formattedName)
 
   if (error) {
     return new Response("Error fetching data", { status: 500 });
   }
 
-  return new Response(JSON.stringify(data), { status: 200 });
+  return new Response(JSON.stringify(game_sessions), { status: 200 });
 }

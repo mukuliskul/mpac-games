@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import GamesGrid from "@/components/GamesGrid";
-import { Game } from "@/lib/types/interfaces"
+import { Game } from "@/lib/types/interfaces";
 
 const GamesPage = () => {
   const [games, setGames] = useState<Game[]>([]);
