@@ -5,12 +5,13 @@ export async function GET(
   { params }: { params: Promise<{ name: string }> }
 ) {
   const { name } = await params;
+  const formattedName = name.replace(/-/g, " ");
 
   const { data, error, count } = await supabase
     .from("games")
     .select("*", { count: "exact" })
-    .ilike("name", name)
-    .limit(1); // Limit the results to 1 row
+    .ilike("name", formattedName)
+    .limit(1);
 
   if (error) {
     return new Response("Error fetching data", { status: 500 });
