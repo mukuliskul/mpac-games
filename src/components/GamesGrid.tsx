@@ -14,7 +14,11 @@ const gradients = [
   "bg-gradient-to-r from-indigo-500 to-cyan-500",
 ];
 
-const GamesGrid = ({ games }: { games: { id: number; name: string; desc: string; image_url: string }[] }) => {
+const GamesGrid = ({
+  games
+}: {
+  games: { id: number; name: string; description: string; image_url: string }[]
+}) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
       {games.map((game, index) => (

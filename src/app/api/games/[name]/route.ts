@@ -13,7 +13,6 @@ export async function GET(
     .limit(1); // Limit the results to 1 row
 
   if (error) {
-    console.log(error);
     return new Response("Error fetching data", { status: 500 });
   }
 

@@ -4,7 +4,7 @@ import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Game } from "@/lib/types/game"
+import { Game } from "@/lib/types/interfaces"
 
 
 export default function GamePage({
@@ -19,7 +19,7 @@ export default function GamePage({
   const router = useRouter();
 
   useEffect(() => {
-    async function fetchGame() {
+    async function fetchGameByName() {
       try {
         const response = await fetch(`/api/games/${name}`);
 
@@ -40,7 +40,7 @@ export default function GamePage({
       }
     }
 
-    fetchGame();
+    fetchGameByName();
   }, [name]);
 
   if (loading) {

@@ -2,18 +2,34 @@
 
 import { useState, useEffect } from "react";
 import GamesGrid from "@/components/GamesGrid";
+import { Game } from "@/lib/types/interfaces"
 
 const GamesPage = () => {
-  const [games, setGames] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [games, setGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetching games
   useEffect(() => {
     async function fetchGames() {
-      const response = await fetch("/api/games");
-      const data = await response.json();
-      setGames(data);
-      setLoading(false);
+      try {
+        const response = await fetch("/api/games");
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch games');
+        }
+
+        const data = await response.json();
+        setGames(data);
+        setLoading(false);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError('Failed to fetch games.');
+        } else {
+          setError('An unexpected error occurred.');
+        }
+        setLoading(false);
+      }
     }
 
     fetchGames();
@@ -21,6 +37,10 @@ const GamesPage = () => {
 
   if (loading) {
     return <p className="text-center text-gray-500 text-lg">Loading games...</p>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
   }
 
   return (
