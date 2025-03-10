@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Game } from "@/lib/types/interfaces"
+import { Progress } from "@/components/ui/progress";
 
 
 export default function GamePage({
@@ -15,8 +16,18 @@ export default function GamePage({
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState<number>(0);
   const { name } = use(params);
   const router = useRouter();
+
+  useEffect(() => {
+    if (loading) {
+      const interval = setInterval(() => {
+        setProgress((prev) => (prev < 90 ? prev + 10 : prev));
+      }, 50);
+      return () => clearInterval(interval);
+    }
+  }, [loading]);
 
   useEffect(() => {
     async function fetchGameByName() {
@@ -44,7 +55,12 @@ export default function GamePage({
   }, [name]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <p className="text-gray-500 text-lg mb-4">Loading games...</p>
+        <Progress value={progress} className="w-64" />
+      </div>
+    );
   }
 
   if (error) {
