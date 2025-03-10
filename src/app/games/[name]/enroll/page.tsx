@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 import { GameSession } from "@/lib/types/interfaces";
+import { convertTimetzTo12HourFormat } from "@/lib/utils";
 
 export default function Enroll({
   params,
@@ -83,8 +84,8 @@ export default function Enroll({
                 <h3 className="text-xl font-semibold">{session.game_name}</h3>
               </CardHeader>
               <CardContent>
-                <p><strong>Start Time:</strong> {session.start_time}</p>
-                <p><strong>End Time:</strong> {session.end_time}</p>
+                <p><strong>Start Time:</strong> {convertTimetzTo12HourFormat(session.start_time)}</p>
+                <p><strong>End Time:</strong> {convertTimetzTo12HourFormat(session.end_time)}</p>
                 <p><strong>Status:</strong> {session.status}</p>
                 <p><strong>Enrolled:</strong> {session.enrolled_count}</p>
                 <p><strong>Day:</strong> {session.day}</p>
