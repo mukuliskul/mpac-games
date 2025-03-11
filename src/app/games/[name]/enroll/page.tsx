@@ -62,14 +62,14 @@ export default function Enroll({
 
   return (
     <div className="container mx-auto px-6 py-10">
-      <h1 className="text-4xl font-semibold text-center text-gray-800 mb-8">Game Sessions</h1>
+      <h1 className="text-4xl font-semibold text-center text-gray-800 mb-8">Game Sessions for {name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()}</h1>
 
       {/* Day Selector */}
       <div className="flex justify-center gap-4 mb-8">
         {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map((day) => (
           <Button
             key={day}
-            variant={selectedDay === day ? "primary" : "secondary"}
+            variant={selectedDay === day ? "default" : "secondary"}
             onClick={() => setSelectedDay(day)}
           >
             {day}
@@ -80,17 +80,16 @@ export default function Enroll({
       {/* Game Sessions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {filteredSessions.length > 0 ? (
-          filteredSessions.map((session) => (
+          filteredSessions.map((session, index) => (
             <Card key={session.id}>
               <CardHeader>
-                <h3 className="text-xl font-semibold">{session.game_name}</h3>
+                <h3 className="text-xl font-semibold">Slot {index + 1}</h3>
               </CardHeader>
               <CardContent>
                 <p><strong>Start Time:</strong> {convertTimetzTo12HourFormat(session.start_time)}</p>
                 <p><strong>End Time:</strong> {convertTimetzTo12HourFormat(session.end_time)}</p>
                 <p><strong>Status:</strong> {session.status}</p>
                 <p><strong>Enrolled:</strong> {session.enrolled_count}</p>
-                <p><strong>Day:</strong> {session.day}</p>
               </CardContent>
             </Card>
           ))
