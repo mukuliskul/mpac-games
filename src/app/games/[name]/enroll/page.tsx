@@ -5,8 +5,10 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Spinner } from '@/components/ui/spinner';
+import { Input } from "@/components/ui/input";
 import { GameSession } from "@/lib/types/interfaces";
 import { convertTimetzTo12HourFormat } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 export default function Enroll({
   params,
@@ -14,10 +16,15 @@ export default function Enroll({
   params: Promise<{ name: string }>;
 }>) {
   const { name } = use(params);
-  const [selectedDay, setSelectedDay] = useState<string>("Monday");
-  const [gameSessions, setGameSessions] = useState<GameSession[]>([]);
+
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [gameSessions, setGameSessions] = useState<GameSession[]>([]);
+  const [selectedDay, setSelectedDay] = useState<string>("Monday");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<GameSession | null>(null);
+  const [userName, setUserName] = useState("");
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchGameSessions() {
@@ -60,6 +67,48 @@ export default function Enroll({
     (session) => session.day === selectedDay
   );
 
+  const openModal = (session: GameSession) => {
+    setSelectedSession(session);
+    setIsModalOpen(true);
+  };
+
+  // TODO: also update enrolled count by 1
+  // TODO: find a way to show all enroll players
+  const handleSubmit = async () => {
+    if (!userName.trim()) {
+      setSubmitError("Please enter your name");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/enroll`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: selectedSession?.id,
+          name: userName
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        // Make sure the error message is a string, not an object
+        setSubmitError(errorData?.message || "Failed to enroll");
+        return;
+      }
+
+      setSubmitError(null);
+      setIsModalOpen(false);
+      setUserName("");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setSubmitError(err.message);
+      } else {
+        setSubmitError("An unexpected error occurred. Please try again.");
+      }
+    }
+  };
+
   return (
     <div className="container mx-auto px-6 py-10">
       <h1 className="text-4xl font-semibold text-center text-gray-800 mb-8">Game Sessions for {name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()}</h1>
@@ -100,7 +149,9 @@ export default function Enroll({
                   <strong>📌 Status:</strong> {session.status}
                 </p>
                 <p><strong>👥 Enrolled:</strong> {session.enrolled_count}</p>
-                <Button className="w-full mt-2">Join Session</Button>
+                <Button className="w-full mt-2" onClick={() => openModal(session)}>
+                  Join Session
+                </Button>
               </CardContent>
             </Card>
           ))
@@ -108,6 +159,31 @@ export default function Enroll({
           <div className="text-center text-gray-600">No sessions available for {selectedDay}</div>
         )}
       </div>
+
+      {/* Modal Popup */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="p-6 rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-semibold">Join Game Session</DialogTitle>
+          </DialogHeader>
+          {/* Input field for username */}
+          <Input
+            type="text"
+            placeholder="Enter your name"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+            className="mt-4 p-2 border rounded-md w-full"
+          />
+          {/* Error message displayed inside the modal */}
+          {submitError && (
+            <div className="mt-4 text-red-600 font-semibold text-sm">{submitError}</div>
+          )}
+          <DialogFooter className="flex justify-end space-x-2 mt-4">
+            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+            <Button onClick={handleSubmit} className="bg-blue-600 text-white">Submit</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

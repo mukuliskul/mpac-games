@@ -23,7 +23,6 @@ export default function GamePage({
     async function fetchGameByName() {
       try {
         const response = await fetch(`/api/games/${name}`);
-
         if (!response.ok) {
           throw new Error('Game not found');
         }
