@@ -4,7 +4,7 @@ import { use } from "react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Spinner } from '@/components/ui/spinner';
 import { GameSession } from "@/lib/types/interfaces";
 import { convertTimetzTo12HourFormat } from "@/lib/utils";
 
@@ -18,22 +18,11 @@ export default function Enroll({
   const [gameSessions, setGameSessions] = useState<GameSession[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [progress, setProgress] = useState<number>(0);
 
-  useEffect(() => {
-    if (loading) {
-      const interval = setInterval(() => {
-        setProgress((prev) => (prev < 90 ? prev + 10 : prev));
-      }, 50);
-      return () => clearInterval(interval);
-    }
-  }, [loading]);
-  // Fetching enroll
   useEffect(() => {
     async function fetchGameSessions() {
       try {
         const response = await fetch(`/api/games/${name}/session`);
-
         if (!response.ok) {
           throw new Error('Failed to fetch game sessions');
         }
@@ -57,8 +46,7 @@ export default function Enroll({
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
-        <p className="text-gray-500 text-lg mb-4">Loading games...</p>
-        <Progress value={progress} className="w-64" />
+        <Spinner />;
       </div>
     );
   }
