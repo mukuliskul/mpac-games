@@ -96,6 +96,12 @@ export default function Enroll({
   const openModal = (session: GameSession) => {
     setSelectedSession(session);
     setIsModalOpen(true);
+    setSubmitError(null);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSubmitError(null);
   };
 
   // TODO: also update enrolled count by 1
@@ -213,7 +219,7 @@ export default function Enroll({
           )}
 
           <DialogFooter className="flex justify-end space-x-2 mt-4">
-            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+            <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
             <Button onClick={handleSubmit} className="bg-blue-600 text-white">Submit</Button>
           </DialogFooter>
         </DialogContent>
