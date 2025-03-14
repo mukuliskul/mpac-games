@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   }
 
   if (existingUser) {
-    return new Response(JSON.stringify({ message: "Username already taken, please choose another." }), { status: 400 });
+    return new Response(JSON.stringify({ message: "Player is already enrolled" }), { status: 400 });
   }
 
 

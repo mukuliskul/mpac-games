@@ -9,6 +9,11 @@ import { Input } from "@/components/ui/input";
 import { GameSession } from "@/lib/types/interfaces";
 import { convertTimetzTo12HourFormat } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+
+type Players = {
+  username: string;
+};
 
 export default function Enroll({
   params,
@@ -19,12 +24,33 @@ export default function Enroll({
 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [players, setPlayers] = useState<Players[]>([]);
   const [gameSessions, setGameSessions] = useState<GameSession[]>([]);
   const [selectedDay, setSelectedDay] = useState<string>("Monday");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<GameSession | null>(null);
   const [userName, setUserName] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchPlayers() {
+      try {
+        const response = await fetch("/api/players");
+        if (!response.ok) {
+          throw new Error("Failed to fetch players");
+        }
+        const data = await response.json();
+        setPlayers(data);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError('Failed to fetch players.');
+        } else {
+          setError('An unexpected error occurred.');
+        }
+      }
+    }
+    fetchPlayers();
+  }, []);
 
   useEffect(() => {
     async function fetchGameSessions() {
@@ -166,18 +192,26 @@ export default function Enroll({
           <DialogHeader>
             <DialogTitle className="text-2xl font-semibold">Join Game Session</DialogTitle>
           </DialogHeader>
-          {/* Input field for username */}
-          <Input
-            type="text"
-            placeholder="Enter your name"
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-            className="mt-4 p-2 border rounded-md w-full"
-          />
+
+          {/* Dropdown for selecting a name */}
+          <Select value={userName} onValueChange={setUserName}>
+            <SelectTrigger className="mt-4 p-2 border rounded-md w-full">
+              <SelectValue placeholder="Select your name" />
+            </SelectTrigger>
+            <SelectContent>
+              {players.map((player, index) => (
+                <SelectItem key={index} value={player.username}>
+                  {player.username}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           {/* Error message displayed inside the modal */}
           {submitError && (
             <div className="mt-4 text-red-600 font-semibold text-sm">{submitError}</div>
           )}
+
           <DialogFooter className="flex justify-end space-x-2 mt-4">
             <Button variant="secondary" onClick={() => setIsModalOpen(false)}>Cancel</Button>
             <Button onClick={handleSubmit} className="bg-blue-600 text-white">Submit</Button>
