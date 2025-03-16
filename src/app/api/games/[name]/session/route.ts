@@ -11,6 +11,7 @@ export async function GET(
     .from('game_sessions')
     .select("*")
     .ilike('game_name', formattedName)
+    .order("start_time", { ascending: true });
 
   if (error) {
     return new Response("Error fetching data", { status: 500 });
