@@ -9,6 +9,7 @@ import { GameSession } from "@/lib/types/interfaces";
 import { convertTimetzTo12HourFormat } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { useCallback } from 'react';
 
 type Players = {
   username: string;
@@ -51,29 +52,28 @@ export default function Enroll({
     fetchPlayers();
   }, []);
 
-  useEffect(() => {
-    async function fetchGameSessions() {
-      try {
-        const response = await fetch(`/api/games/${name}/session`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch game sessions');
-        }
-
-        const data = await response.json();
-        setGameSessions(data);
-        setLoading(false);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError('Failed to fetch game sessions.');
-        } else {
-          setError('An unexpected error occurred.');
-        }
-        setLoading(false);
+  const fetchGameSessions = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/games/${name}/session`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch game sessions");
+      }
+      const data = await response.json();
+      setGameSessions(data);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError("Failed to fetch game sessions.");
+      } else {
+        setError("An unexpected error occurred.");
       }
     }
-
-    fetchGameSessions();
+    setLoading(false);
   }, [name]);
+
+  useEffect(() => {
+    fetchGameSessions();
+  }, [fetchGameSessions]);
 
   if (loading) {
     return (
@@ -103,8 +103,6 @@ export default function Enroll({
     setSubmitError(null);
   };
 
-  // TODO: also update enrolled count by 1
-  // TODO: find a way to show all enroll players
   const handleSubmit = async () => {
     if (!userName.trim()) {
       setSubmitError("Please enter your name");
@@ -131,6 +129,7 @@ export default function Enroll({
       setSubmitError(null);
       setIsModalOpen(false);
       setUserName("");
+      await fetchGameSessions();
     } catch (err: unknown) {
       if (err instanceof Error) {
         setSubmitError(err.message);
