@@ -175,9 +175,6 @@ export default function Enroll({
               <CardContent className="space-y-2">
                 <p><strong>🕒 Start Time:</strong> {convertTimetzTo12HourFormat(session.start_time)}</p>
                 <p><strong>⏳ End Time:</strong> {convertTimetzTo12HourFormat(session.end_time)}</p>
-                <p className={`font-semibold ${session.status === "Open" ? "text-green-600" : "text-red-600"}`}>
-                  <strong>📌 Status:</strong> {session.status}
-                </p>
                 <p><strong>👥 Enrolled:</strong> {session.enrolled_count}</p>
                 <Button className="w-full mt-2" onClick={() => openModal(session)}>
                   Join Session
