@@ -13,7 +13,7 @@ export interface GameSession {
   start_time: string;
   end_time: string;
   status: string;
-  day: string;
+  date: string;
   enrolled_count: number
 }
 

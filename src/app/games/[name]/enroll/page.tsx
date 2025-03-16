@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Spinner } from '@/components/ui/spinner';
 import { GameSession } from "@/lib/types/interfaces";
-import { convertTimetzTo12HourFormat } from "@/lib/utils";
+import { convertTimetzTo12HourFormat, getWeekdayName } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useCallback } from 'react';
@@ -89,7 +89,7 @@ export default function Enroll({
 
   // Filter sessions by selected day
   const filteredSessions = gameSessions.filter(
-    (session) => session.day === selectedDay
+    (session) => getWeekdayName(session.date) === selectedDay
   );
 
   const openModal = (session: GameSession) => {

@@ -11,6 +11,7 @@ export async function POST(request: Request) {
     .from("enrollments")
     .select("username")
     .eq("username", name)
+    .eq("game_session_id", sessionId)
     .single();
 
   if (userError) {
@@ -28,6 +29,7 @@ export async function POST(request: Request) {
 
 
   if (error) {
+    console.error("Error creating enrollment", error);
     return new Response("Error creating enrollment", { status: 500 });
   }
 
