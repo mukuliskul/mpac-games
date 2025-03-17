@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -44,10 +44,6 @@ const GamesGrid = ({
                   {game.name}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-white opacity-90">{game.description}</p>
-              </CardContent>
-
               <div className="absolute -inset-1 rounded-2xl bg-white opacity-10 blur-md transition-all duration-300 group-hover:opacity-20" />
             </Card>
           </Link>
