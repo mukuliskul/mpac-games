@@ -45,7 +45,7 @@ const GamesGrid = ({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-white opacity-90">{game.desc}</p>
+                <p className="text-sm text-white opacity-90">{game.description}</p>
               </CardContent>
 
               <div className="absolute -inset-1 rounded-2xl bg-white opacity-10 blur-md transition-all duration-300 group-hover:opacity-20" />
