@@ -127,12 +127,17 @@ export default function Leaderboard({
 
   return (
     <div className="max-w-2xl mx-auto p-6">
+      {/* Title and Button Row */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold">Leaderboard for {name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()}</h1>
-        <Button className="w-full mt-2" onClick={() => openModal()}>
+        <h1 className="text-3xl font-bold">
+          Leaderboard for {name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()}
+        </h1>
+        <Button className="bg-blue-600 text-white px-4 py-2" onClick={openModal}>
           Add Winner
         </Button>
       </div>
+
+      {/* Leaderboard Table */}
       <Card>
         <CardContent className="p-4">
           <Table>
@@ -155,17 +160,18 @@ export default function Leaderboard({
           </Table>
         </CardContent>
       </Card>
+
       {/* Modal Popup */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="p-6 rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-semibold">Join Game Session</DialogTitle>
+            <DialogTitle className="text-2xl font-semibold">Select name of the winner</DialogTitle>
           </DialogHeader>
 
           {/* Dropdown for selecting a name */}
           <Select value={winner} onValueChange={setWinner}>
             <SelectTrigger className="mt-4 p-2 border rounded-md w-full">
-              <SelectValue placeholder="Select your name" />
+              <SelectValue placeholder="Select winner" />
             </SelectTrigger>
             <SelectContent>
               {players.map((player, index) => (
