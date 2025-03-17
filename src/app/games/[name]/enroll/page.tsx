@@ -10,10 +10,8 @@ import { convertTimetzTo12HourFormat, getWeekdayName } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useCallback } from 'react';
+import { Player } from "@/lib/types/interfaces";
 
-type Players = {
-  username: string;
-};
 
 export default function Enroll({
   params,
@@ -24,7 +22,7 @@ export default function Enroll({
 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [players, setPlayers] = useState<Players[]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [gameSessions, setGameSessions] = useState<GameSession[]>([]);
   const [selectedDay, setSelectedDay] = useState<string>("Monday");
   const [isModalOpen, setIsModalOpen] = useState(false);

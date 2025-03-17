@@ -17,7 +17,11 @@ export interface GameSession {
   enrolled_count: number
 }
 
-export interface Leaderbaord {
+export interface Player {
+  username: string;
+};
+
+export interface Leaderboard {
   username: string;
   wins: number;
 }
