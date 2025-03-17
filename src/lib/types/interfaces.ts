@@ -17,15 +17,7 @@ export interface GameSession {
   enrolled_count: number
 }
 
-// TODO: Design the Enroll interface
-export interface Enroll {
-  id: number;
-  game_id: number;
-  name: string;
-  description: string;
-  image_url: string;
-  rules: string;
-  modes: string;
+export interface Leaderbaord {
+  username: string;
+  wins: number;
 }
-
-
