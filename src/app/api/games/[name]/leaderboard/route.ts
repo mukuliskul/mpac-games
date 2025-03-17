@@ -31,6 +31,8 @@ export async function POST(
 ) {
   const { name } = await params;
   const { username } = await request.json();
+  let formattedName = name.replace(/-/g, " ");
+  formattedName = formattedName.charAt(0).toUpperCase() + formattedName.slice(1);
 
   if (!username) {
     return new Response("Missing required fields", { status: 400 });
@@ -39,7 +41,7 @@ export async function POST(
   const { data: existingScore, error: userError } = await supabase
     .from("leaderboards")
     .select("*")
-    .eq("game_name", name)
+    .eq("game_name", formattedName)
     .eq("username", username)
     .single();
 
@@ -51,7 +53,7 @@ export async function POST(
     const { data: updateScore, error: updateError } = await supabase
       .from("leaderboards")
       .update({ wins: existingScore.wins + 1 })
-      .eq("game_name", name)
+      .eq("game_name", formattedName)
       .eq("username", username);
 
     if (updateError) {
@@ -66,7 +68,7 @@ export async function POST(
   const { data: newScore, error } = await supabase
     .from("leaderboards")
     .insert([
-      { game_name: name, username: name, wins: 1 },
+      { game_name: formattedName, username: username, wins: 1 },
     ]);
 
 
