@@ -13,6 +13,7 @@ import { useCallback } from 'react';
 import { Player } from "@/lib/types/interfaces";
 import { Eye } from "lucide-react";
 
+// TODO: disable day selector for days that have passed
 
 export default function Enroll({
   params,

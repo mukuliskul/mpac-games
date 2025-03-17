@@ -47,7 +47,7 @@ export default function Leaderboard({
   const fetchLeaderboard = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/games/${name}/leaderboard`);
+      const response = await fetch(`/api/leaderboard?game=${name}`);
       if (!response.ok) {
         throw new Error("Failed to fetch leaderboard");
       }
@@ -85,10 +85,11 @@ export default function Leaderboard({
     }
 
     try {
-      const response = await fetch(`/api/games/${name}/leaderboard`, {
+      const response = await fetch(`/api/leaderboard`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          game: name,
           username: winner
         }),
       });
@@ -151,7 +152,7 @@ export default function Leaderboard({
             <TableBody>
               {leaderboard.map(({ username, wins }, index) => (
                 <TableRow key={username}>
-                  <TableCell>{index + 1}</TableCell> {/* Assign rank based on index */}
+                  <TableCell>{index + 1}</TableCell>
                   <TableCell>{username}</TableCell>
                   <TableCell>{wins}</TableCell>
                 </TableRow>

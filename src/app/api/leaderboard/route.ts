@@ -1,18 +1,21 @@
 import { supabase } from "@/lib/supabase";
 
 export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ name: string }> }
+  request: Request,
 ) {
-  const { name } = await params;
+  const url = new URL(request.url);
+  const game = url.searchParams.get("game");
 
-  console.log(name);
-  const formattedName = name.replace(/-/g, " ");
+  if (!game) {
+    return new Response("Missing required fields", { status: 400 });
+  }
+
+  const formattedGame = game.replace(/-/g, " ");
 
   const { data: leaderboards, error } = await supabase
     .from('leaderboards')
     .select("*")
-    .ilike('game_name', formattedName)
+    .ilike('game_name', formattedGame)
     .order("wins", { ascending: false })
     .order("updated_at", { ascending: false });
 
@@ -27,12 +30,11 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ name: string }> }
 ) {
-  const { name } = await params;
-  const { username } = await request.json();
-  let formattedName = name.replace(/-/g, " ");
-  formattedName = formattedName.charAt(0).toUpperCase() + formattedName.slice(1);
+  const { username, game } = await request.json();
+
+  let formattedGame = game.replace(/-/g, " ");
+  formattedGame = formattedGame.charAt(0).toUpperCase() + formattedGame.slice(1);
 
   if (!username) {
     return new Response("Missing required fields", { status: 400 });
@@ -41,7 +43,7 @@ export async function POST(
   const { data: existingScore, error: userError } = await supabase
     .from("leaderboards")
     .select("*")
-    .eq("game_name", formattedName)
+    .eq("game_name", formattedGame)
     .eq("username", username)
     .single();
 
@@ -53,7 +55,7 @@ export async function POST(
     const { data: updateScore, error: updateError } = await supabase
       .from("leaderboards")
       .update({ wins: existingScore.wins + 1 })
-      .eq("game_name", formattedName)
+      .eq("game_name", formattedGame)
       .eq("username", username);
 
     if (updateError) {
@@ -68,7 +70,7 @@ export async function POST(
   const { data: newScore, error } = await supabase
     .from("leaderboards")
     .insert([
-      { game_name: formattedName, username: username, wins: 1 },
+      { game_name: formattedGame, username: username, wins: 1 },
     ]);
 
 
@@ -79,4 +81,5 @@ export async function POST(
 
   return new Response(JSON.stringify(newScore), { status: 200 });
 }
+
 
