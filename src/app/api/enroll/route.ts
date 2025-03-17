@@ -18,6 +18,8 @@ export async function GET(request: Request) {
     return new Response("Error fetching enrollments", { status: 500 });
   }
 
+  console.log(data);
+
   return new Response(JSON.stringify(data), { status: 200 });
 }
 

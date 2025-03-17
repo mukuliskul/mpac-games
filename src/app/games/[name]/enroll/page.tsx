@@ -30,6 +30,8 @@ export default function Enroll({
   const [selectedSession, setSelectedSession] = useState<GameSession | null>(null);
   const [userName, setUserName] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [enrolledPlayers, setEnrolledPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
     async function fetchPlayers() {
@@ -90,6 +92,18 @@ export default function Enroll({
     setSelectedSession(session);
     setIsEnrollModalOpen(true);
     setSubmitError(null);
+  };
+
+  const openViewModal = async (session: GameSession) => {
+    try {
+      const response = await fetch(`/api/enroll?sessionId=${session.id}`);
+      if (!response.ok) throw new Error("Failed to fetch enrolled players");
+      setEnrolledPlayers(await response.json());
+    } catch (err) {
+      console.error(err);
+      setEnrolledPlayers([]);
+    }
+    setIsViewModalOpen(true);
   };
 
   const handleCloseEnrollModal = () => {
@@ -205,6 +219,23 @@ export default function Enroll({
           <DialogFooter className="flex justify-end space-x-2 mt-4">
             <Button variant="secondary" onClick={handleCloseEnrollModal}>Cancel</Button>
             <Button onClick={handleEnrollSubmit} className="bg-blue-600 text-white">Submit</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Enrolled Players Modal */}
+      <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+        <DialogContent className="p-6 rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-semibold">Enrolled Players</DialogTitle>
+          </DialogHeader>
+          <ul>
+            {enrolledPlayers.length > 0 ? enrolledPlayers.map((player, index) => (
+              <li key={index} className="py-1">{player.username}</li>
+            )) : <p>No players enrolled yet.</p>}
+          </ul>
+          <DialogFooter className="flex justify-end mt-4">
+            <Button variant="secondary" onClick={() => setIsViewModalOpen(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
