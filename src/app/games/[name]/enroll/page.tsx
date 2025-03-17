@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useCallback } from 'react';
 import { Player } from "@/lib/types/interfaces";
+import { Eye } from "lucide-react";
 
 
 export default function Enroll({
@@ -25,7 +26,7 @@ export default function Enroll({
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameSessions, setGameSessions] = useState<GameSession[]>([]);
   const [selectedDay, setSelectedDay] = useState<string>("Monday");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<GameSession | null>(null);
   const [userName, setUserName] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -85,23 +86,18 @@ export default function Enroll({
     return <div>{error}</div>;
   }
 
-  // Filter sessions by selected day
-  const filteredSessions = gameSessions.filter(
-    (session) => getWeekdayName(session.date) === selectedDay
-  );
-
-  const openModal = (session: GameSession) => {
+  const openEnrollModal = (session: GameSession) => {
     setSelectedSession(session);
-    setIsModalOpen(true);
+    setIsEnrollModalOpen(true);
     setSubmitError(null);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleCloseEnrollModal = () => {
+    setIsEnrollModalOpen(false);
     setSubmitError(null);
   };
 
-  const handleSubmit = async () => {
+  const handleEnrollSubmit = async () => {
     if (!userName.trim()) {
       setSubmitError("Please enter your name");
       return;
@@ -125,7 +121,7 @@ export default function Enroll({
       }
 
       setSubmitError(null);
-      setIsModalOpen(false);
+      setIsEnrollModalOpen(false);
       setUserName("");
       await fetchGameSessions();
     } catch (err: unknown) {
@@ -160,33 +156,28 @@ export default function Enroll({
 
       {/* Game Sessions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {filteredSessions.length > 0 ? (
-          filteredSessions.map((session, index) => (
-            <Card
-              key={session.id}
-              className={`p-4 border rounded-xl shadow-lg transition-transform transform hover:scale-105 hover:shadow-xl ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                }`}
-            >
-              <CardHeader className="text-center">
-                <h3 className="text-xl font-bold text-gray-800">Slot {index + 1}</h3>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <p><strong>🕒 Start Time:</strong> {convertTimetzTo12HourFormat(session.start_time)}</p>
-                <p><strong>⏳ End Time:</strong> {convertTimetzTo12HourFormat(session.end_time)}</p>
-                <p><strong>👥 Enrolled:</strong> {session.enrolled_count}</p>
-                <Button className="w-full mt-2" onClick={() => openModal(session)}>
-                  Join Session
-                </Button>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          <div className="text-center text-gray-600">No sessions available for {selectedDay}</div>
-        )}
+        {gameSessions.filter(s => getWeekdayName(s.date) === selectedDay).map((session, index) => (
+          <Card key={session.id} className="p-4 border rounded-xl shadow-lg">
+            <CardHeader className="text-center">
+              <h3 className="text-xl font-bold">Slot {index + 1}</h3>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <p><strong>🕒 Start Time:</strong> {convertTimetzTo12HourFormat(session.start_time)}</p>
+              <p><strong>⏳ End Time:</strong> {convertTimetzTo12HourFormat(session.end_time)}</p>
+              <p>
+                <strong>👥 Enrolled:</strong> {session.enrolled_count}
+                {session.enrolled_count > 0 && (
+                  <Eye className="inline ml-2 cursor-pointer" onClick={() => openViewModal(session)} />
+                )}
+              </p>
+              <Button className="w-full mt-2" onClick={() => openEnrollModal(session)}>Join Session</Button>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Modal Popup */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+      <Dialog open={isEnrollModalOpen} onOpenChange={setIsEnrollModalOpen}>
         <DialogContent className="p-6 rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-semibold">Join Game Session</DialogTitle>
@@ -212,8 +203,8 @@ export default function Enroll({
           )}
 
           <DialogFooter className="flex justify-end space-x-2 mt-4">
-            <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
-            <Button onClick={handleSubmit} className="bg-blue-600 text-white">Submit</Button>
+            <Button variant="secondary" onClick={handleCloseEnrollModal}>Cancel</Button>
+            <Button onClick={handleEnrollSubmit} className="bg-blue-600 text-white">Submit</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
