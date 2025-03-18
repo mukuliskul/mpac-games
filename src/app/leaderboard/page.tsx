@@ -48,11 +48,11 @@ export default function AggregateLeaderboard() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className="container mx-auto px-6 py-10">
       {/* Title and Button Row */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-center items-center mb-4">
         <h1 className="text-3xl font-bold">
-          Leaderboard
+          Aggregate Leaderboard
         </h1>
       </div>
 
@@ -65,4 +65,3 @@ export default function AggregateLeaderboard() {
     </div>
   );
 }
-
