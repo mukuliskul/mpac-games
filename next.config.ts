@@ -10,13 +10,7 @@ const nextConfig: NextConfig = {
     ],
   },
   async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/games',
-        permanent: true,
-      },
-    ];
+    return [];
   },
 };
 
