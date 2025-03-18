@@ -3,12 +3,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { use } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { Leaderboard, Player } from "@/lib/types/interfaces";
 import { Spinner } from '@/components/ui/spinner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import LeaderboardTable from "@/components/LeaderboardTable";
 
 export default function Leaderboard({
   params,
@@ -141,24 +141,7 @@ export default function Leaderboard({
       {/* Leaderboard Table */}
       <Card>
         <CardContent className="p-4">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-16">Rank</TableHead>
-                <TableHead>Player</TableHead>
-                <TableHead className="w-24">Wins</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {leaderboard.map(({ username, wins }, index) => (
-                <TableRow key={username}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{username}</TableCell>
-                  <TableCell>{wins}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <LeaderboardTable leaderboard={leaderboard} />
         </CardContent>
       </Card>
 

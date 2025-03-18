@@ -1,9 +1,9 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { AggregateLeaderboard } from '@/lib/types/interfaces';
+import { Leaderboard } from '@/lib/types/interfaces';
 
 interface LeaderboardTableProps {
-  leaderboard: AggregateLeaderboard[]; // Array of leaderboard entries
+  leaderboard: Leaderboard[]; // Array of leaderboard entries
 }
 
 const LeaderboardTable: React.FC<LeaderboardTableProps> = ({ leaderboard }) => {

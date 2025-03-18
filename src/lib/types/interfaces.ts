@@ -23,11 +23,6 @@ export interface Player {
 
 export interface Leaderboard {
   username: string;
-  wins: number;
-}
-
-export interface AggregateLeaderboard {
-  username: string;
   total_wins: number;
   last_updated: string;
 }

@@ -9,10 +9,8 @@ export async function GET(request: Request) {
 
     const { data: leaderboards, error } = await supabase
       .from("leaderboards")
-      .select("*")
+      .select("username, total_wins:wins, last_updated:updated_at")
       .ilike("game_name", formattedGame)
-      .order("wins", { ascending: false })
-      .order("updated_at", { ascending: false });
 
     if (error) {
       console.error("Error fetching leaderboards:", error);
