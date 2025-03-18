@@ -1,31 +1,40 @@
 import { supabase } from "@/lib/supabase";
 
-export async function GET(
-  request: Request,
-) {
+export async function GET(request: Request) {
   const url = new URL(request.url);
   const game = url.searchParams.get("game");
 
-  if (!game) {
-    return new Response("Missing required fields", { status: 400 });
+  if (game) {
+    const formattedGame = game.replace(/-/g, " ");
+
+    const { data: leaderboards, error } = await supabase
+      .from("leaderboards")
+      .select("*")
+      .ilike("game_name", formattedGame)
+      .order("wins", { ascending: false })
+      .order("updated_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching leaderboards:", error);
+      return new Response("Error fetching data", { status: 500 });
+    }
+
+    return new Response(JSON.stringify(leaderboards), { status: 200 });
   }
 
-  const formattedGame = game.replace(/-/g, " ");
+  // Aggregate total wins for each unique username
+  const { data: totalWins, error } = await supabase
+    .from("leaderboards")
+    .select("username, total_wins:wins.sum(), last_updated:updated_at.max()")
 
-  const { data: leaderboards, error } = await supabase
-    .from('leaderboards')
-    .select("*")
-    .ilike('game_name', formattedGame)
-    .order("wins", { ascending: false })
-    .order("updated_at", { ascending: false });
-
+  console.log(totalWins);
 
   if (error) {
-    console.log(error);
+    console.error("Error fetching total wins:", error);
     return new Response("Error fetching data", { status: 500 });
   }
 
-  return new Response(JSON.stringify(leaderboards), { status: 200 });
+  return new Response(JSON.stringify(totalWins), { status: 200 });
 }
 
 export async function POST(
