@@ -19,6 +19,14 @@ const GamesGrid = ({
 }: {
   games: { id: number; name: string; description: string; image_url: string }[]
 }) => {
+  if (games.length === 0) {
+    return (
+      <div className="text-center text-gray-500 text-lg">
+        No games found.
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
       {games.map((game, index) => (
@@ -54,3 +62,4 @@ const GamesGrid = ({
 };
 
 export default GamesGrid;
+

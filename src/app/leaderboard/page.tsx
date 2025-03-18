@@ -2,21 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { AggregateLeaderboard } from "@/lib/types/interfaces";
 import { Spinner } from '@/components/ui/spinner';
+import LeaderboardTable from "@/components/LeaderboardTable";
 
 export default function AggregateLeaderboard() {
   const [leaderboard, setLeaderboard] = useState<AggregateLeaderboard[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const sortedLeaderboard = [...leaderboard].sort((a, b) => {
-    if (b.total_wins !== a.total_wins) {
-      return b.total_wins - a.total_wins; // Sort by total_wins (descending)
-    }
-    return new Date(b.last_updated).getTime() - new Date(a.last_updated).getTime(); // If tied, sort by last_updated (descending)
-  });
 
   useEffect(() => {
     async function fetchLeaderboard() {
@@ -66,24 +59,7 @@ export default function AggregateLeaderboard() {
       {/* Leaderboard Table */}
       <Card>
         <CardContent className="p-4">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-16">Rank</TableHead>
-                <TableHead>Player</TableHead>
-                <TableHead className="w-24">Wins</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedLeaderboard.map(({ username, total_wins }, index) => (
-                <TableRow key={username}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{username}</TableCell>
-                  <TableCell>{total_wins}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <LeaderboardTable leaderboard={leaderboard} />
         </CardContent>
       </Card>
     </div>

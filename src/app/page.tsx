@@ -5,7 +5,7 @@ import GamesGrid from "@/components/GamesGrid";
 import { Game, AggregateLeaderboard } from "@/lib/types/interfaces";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import LeaderboardTable from "@/components/LeaderboardTable";
 
 const Homepage = () => {
   const [games, setGames] = useState<Game[]>([]);
@@ -63,13 +63,6 @@ const Homepage = () => {
     fetchLeaderboard();
   }, []);
 
-  const sortedLeaderboard = [...leaderboard].sort((a, b) => {
-    if (b.total_wins !== a.total_wins) {
-      return b.total_wins - a.total_wins;
-    }
-    return new Date(b.last_updated).getTime() - new Date(a.last_updated).getTime();
-  });
-
   if (loadingGames || loadingLeaderboard) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
@@ -89,40 +82,15 @@ const Homepage = () => {
       <h1 className="text-4xl font-semibold text-center text-gray-800 mb-8">Leaderboard</h1>
       <Card className="mb-10">
         <CardContent className="p-4">
-          {sortedLeaderboard.length === 0 ? (
-            <p className="text-center text-gray-500 text-lg">No leaderboard data available.</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-16">Rank</TableHead>
-                  <TableHead>Player</TableHead>
-                  <TableHead className="w-24">Wins</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sortedLeaderboard.map(({ username, total_wins }, index) => (
-                  <TableRow key={username}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>{username}</TableCell>
-                    <TableCell>{total_wins}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+          <LeaderboardTable leaderboard={leaderboard} />
         </CardContent>
       </Card>
 
       {/* Games Section */}
       <h1 className="text-4xl font-semibold text-center text-gray-800 mb-8">Games List</h1>
-      {games.length === 0 ? (
-        <p className="text-center text-gray-500 text-lg">No games found.</p>
-      ) : (
-        <GamesGrid games={games} />
-      )}
+      <GamesGrid games={games} />
     </div>
   );
-}
+};
 
 export default Homepage;

@@ -60,11 +60,7 @@ const GamesPage = () => {
       <h1 className="text-4xl font-semibold text-center text-gray-800 mb-8">
         Games List
       </h1>
-      {games.length === 0 ? (
-        <p className="text-center text-gray-500 text-lg">No games found.</p>
-      ) : (
-        <GamesGrid games={games} />
-      )}
+      <GamesGrid games={games} />
     </div>
   );
 };
