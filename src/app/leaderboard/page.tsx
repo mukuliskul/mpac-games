@@ -6,11 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import type { AggregateLeaderboard } from "@/lib/types/interfaces";
 import { Spinner } from '@/components/ui/spinner';
 
-export default function Leaderboard({
-  params,
-}: Readonly<{
-  params: Promise<{ name: string }>;
-}>) {
+export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<AggregateLeaderboard[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
