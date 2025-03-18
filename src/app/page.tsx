@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from "react";
 import GamesGrid from "@/components/GamesGrid";
-import { Game, AggregateLeaderboard } from "@/lib/types/interfaces";
+import { Game, Leaderboard } from "@/lib/types/interfaces";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import LeaderboardTable from "@/components/LeaderboardTable";
 
 const Homepage = () => {
   const [games, setGames] = useState<Game[]>([]);
-  const [leaderboard, setLeaderboard] = useState<AggregateLeaderboard[]>([]);
+  const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
   const [loadingGames, setLoadingGames] = useState(true);
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(true);
   const [errorGames, setErrorGames] = useState<string | null>(null);

@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import type { AggregateLeaderboard } from "@/lib/types/interfaces";
+import type { Leaderboard } from "@/lib/types/interfaces";
 import { Spinner } from '@/components/ui/spinner';
 import LeaderboardTable from "@/components/LeaderboardTable";
 
 export default function AggregateLeaderboard() {
-  const [leaderboard, setLeaderboard] = useState<AggregateLeaderboard[]>([]);
+  const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
