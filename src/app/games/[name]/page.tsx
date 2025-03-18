@@ -151,29 +151,18 @@ export default function GamePage({
       {/* Game Title */}
       <h1 className="text-4xl font-bold text-center mb-6">{game.name}</h1>
 
-      {/* Game Description */}
+      {/* Game Description and Modes Combined */}
       <Card className="mb-6 p-4 shadow-md">
         <h2 className="text-2xl font-semibold mb-4">Description</h2>
         <p className="text-lg">{game.description}</p>
+
+        {game.modes && (
+          <>
+            <h2 className="text-2xl font-semibold mt-6 mb-4">Game Modes</h2>
+            <p className="text-lg">{game.modes}</p>
+          </>
+        )}
       </Card>
-
-      {/* Enroll Button */}
-      <div className="flex justify-center mb-6">
-        <Button
-          onClick={() => router.push(`/games/${game.name.toLowerCase().replace(/\s+/g, '-')}/enroll`)}
-          className="w-full max-w-xs"
-        >
-          Enroll
-        </Button>
-      </div>
-
-      {/* Game Modes */}
-      {game.modes && (
-        <Card className="mb-6 p-4 shadow-md">
-          <h2 className="text-2xl font-semibold mb-4">Game Modes</h2>
-          <p className="text-lg">{game.modes}</p>
-        </Card>
-      )}
 
       {/* Leaderboard Section */}
       <div className="mt-6">
@@ -189,6 +178,16 @@ export default function GamePage({
             <LeaderboardTable leaderboard={leaderboard} />
           </CardContent>
         </Card>
+      </div>
+
+      {/* Enroll Button */}
+      <div className="flex justify-center mt-6">
+        <Button
+          onClick={() => router.push(`/games/${game.name.toLowerCase().replace(/\s+/g, '-')}/enroll`)}
+          className="w-full max-w-xs"
+        >
+          Enroll
+        </Button>
       </div>
 
       {/* Modal for Selecting Winner */}
