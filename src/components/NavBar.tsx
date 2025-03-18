@@ -23,7 +23,7 @@ const NavBar = () => {
         {/* Logo/Brand */}
         <div className="flex items-center space-x-4">
           <h1
-            className="text-xl font-semibold cursor-pointer hover:text-yellow-500 transition duration-300"
+            className="text-2xl font-bold cursor-pointer hover:text-yellow-500 transition duration-300"
             onClick={() => navigateTo('/')}
           >
             MPACC Games
@@ -31,16 +31,16 @@ const NavBar = () => {
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-6">
+        <div className="hidden md:flex space-x-8">
           <button
             onClick={() => navigateTo('/games')}
-            className={`text-sm uppercase hover:text-yellow-500 transition duration-300 ${isActive('/games') ? 'text-yellow-500' : ''}`}
+            className={`text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive('/games') ? 'text-yellow-500 border-b-2 border-yellow-500' : ''}`}
           >
             Games
           </button>
           <button
             onClick={() => navigateTo('/leaderboard')}
-            className={`text-sm uppercase hover:text-yellow-500 transition duration-300 ${isActive('/leaderboard') ? 'text-yellow-500' : ''}`}
+            className={`text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive('/leaderboard') ? 'text-yellow-500 border-b-2 border-yellow-500' : ''}`}
           >
             Leaderboard
           </button>
@@ -59,13 +59,13 @@ const NavBar = () => {
         <div className="md:hidden flex flex-col space-y-4 mt-4 bg-gradient-to-r from-blue-800 to-indigo-900 p-4 rounded-lg border-t border-indigo-600 shadow-md transition-all ease-in-out duration-300">
           <button
             onClick={() => navigateTo('/games')}
-            className={`text-white text-lg uppercase hover:text-yellow-500 transition duration-300 ${isActive('/games') ? 'text-yellow-500' : ''}`}
+            className={`text-white text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive('/games') ? 'text-yellow-500 border-b-2 border-yellow-500' : ''}`}
           >
             Games
           </button>
           <button
             onClick={() => navigateTo('/leaderboard')}
-            className={`text-white text-lg uppercase hover:text-yellow-500 transition duration-300 ${isActive('/leaderboard') ? 'text-yellow-500' : ''}`}
+            className={`text-white text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive('/leaderboard') ? 'text-yellow-500 border-b-2 border-yellow-500' : ''}`}
           >
             Leaderboard
           </button>
