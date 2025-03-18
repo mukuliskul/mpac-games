@@ -4,7 +4,7 @@ import { use, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner } from "@/components/ui/spinner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import LeaderboardTable from "@/components/LeaderboardTable";
@@ -12,9 +12,7 @@ import type { Game, Leaderboard, Player } from "@/lib/types/interfaces";
 
 export default function GamePage({
   params,
-}: Readonly<{
-  params: Promise<{ name: string }>;
-}>) {
+}: Readonly<{ params: Promise<{ name: string }> }>) {
   const router = useRouter();
   const { name } = use(params);
   const [game, setGame] = useState<Game | null>(null);
@@ -26,6 +24,7 @@ export default function GamePage({
   const [players, setPlayers] = useState<Player[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Fetch game details by name
   useEffect(() => {
     async function fetchGameByName() {
       try {
@@ -38,11 +37,8 @@ export default function GamePage({
         setGame(data);
         setLoading(false);
       } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError('Failed to fetch game details.');
-        } else {
-          setError('An unexpected error occurred.');
-        }
+        console.error(err);
+        setError('Failed to fetch game details.');
         setLoading(false);
       }
     }
@@ -50,41 +46,36 @@ export default function GamePage({
     fetchGameByName();
   }, [name]);
 
+  // Fetch players list
   useEffect(() => {
     async function fetchPlayers() {
       try {
         const response = await fetch("/api/players");
-        if (!response.ok) {
-          throw new Error("Failed to fetch players");
-        }
+        if (!response.ok) throw new Error("Failed to fetch players");
+
         const data = await response.json();
         setPlayers(data);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError('Failed to fetch players.');
-        } else {
-          setError('An unexpected error occurred.');
-        }
+      } catch (err) {
+        console.error(err);
+        setError('Failed to fetch players.');
       }
     }
+
     fetchPlayers();
   }, []);
 
+  // Fetch leaderboard for the game
   const fetchLeaderboard = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/leaderboard?game=${name}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch leaderboard");
-      }
+      if (!response.ok) throw new Error("Failed to fetch leaderboard");
+
       const data = await response.json();
       setLeaderboard(data);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError('Failed to fetch leaderboard.');
-      } else {
-        setError('An unexpected error occurred.');
-      }
+    } catch (err) {
+      console.error(err);
+      setError('Failed to fetch leaderboard.');
     } finally {
       setLoading(false);
     }
@@ -94,6 +85,7 @@ export default function GamePage({
     fetchLeaderboard();
   }, [fetchLeaderboard]);
 
+  // Modal open/close handlers
   const openModal = () => {
     setIsModalOpen(true);
     setSubmitError(null);
@@ -104,6 +96,7 @@ export default function GamePage({
     setSubmitError(null);
   };
 
+  // Handle winner submission
   const handleSubmit = async () => {
     if (!winner.trim()) {
       setSubmitError("Please enter your name");
@@ -122,7 +115,6 @@ export default function GamePage({
 
       if (!response.ok) {
         const errorData = await response.json();
-        // Make sure the error message is a string, not an object
         setSubmitError(errorData?.message || "Failed to enroll");
         return;
       }
@@ -132,28 +124,26 @@ export default function GamePage({
       setWinner("");
       await fetchLeaderboard();
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setSubmitError(err.message);
-      } else {
-        setSubmitError("An unexpected error occurred. Please try again.");
-      }
+      console.error(err);
+      setSubmitError("An unexpected error occurred. Please try again.");
     }
   };
 
+  // Loading and Error Handling UI
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <Spinner />;
+      <div className="flex items-center justify-center h-screen">
+        <Spinner />
       </div>
     );
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return <div className="text-center text-red-600">{error}</div>;
   }
 
   if (!game) {
-    return <div>Game not found!</div>;
+    return <div className="text-center">Game not found!</div>;
   }
 
   return (
@@ -162,69 +152,68 @@ export default function GamePage({
       <h1 className="text-4xl font-bold text-center mb-6">{game.name}</h1>
 
       {/* Game Description */}
-      <Card className="mb-6 p-4">
-        <h2 className="text-2xl font-semibold">Description</h2>
+      <Card className="mb-6 p-4 shadow-md">
+        <h2 className="text-2xl font-semibold mb-4">Description</h2>
         <p className="text-lg">{game.description}</p>
       </Card>
 
-      {/* Action Buttons */}
-      <div className="flex justify-between mb-6">
+      {/* Enroll Button */}
+      <div className="flex justify-center mb-6">
         <Button
           onClick={() => router.push(`/games/${game.name.toLowerCase().replace(/\s+/g, '-')}/enroll`)}
-          className="w-full"
+          className="w-full max-w-xs"
         >
           Enroll
         </Button>
       </div>
 
+      {/* Game Modes */}
       {game.modes && (
-        <Card className="mb-6 p-4">
-          <h2 className="text-2xl font-semibold">Game Modes:</h2>
+        <Card className="mb-6 p-4 shadow-md">
+          <h2 className="text-2xl font-semibold mb-4">Game Modes</h2>
           <p className="text-lg">{game.modes}</p>
         </Card>
       )}
 
-      {/* Leaderboard */}
+      {/* Leaderboard Section */}
       <div className="mt-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-3xl font-bold">
-            Leaderboard for {game.name.charAt(0).toUpperCase() + game.name.slice(1).toLowerCase()}
-          </h2>
+          <h2 className="text-3xl font-bold">Leaderboard</h2>
           <Button className="bg-blue-600 text-white px-4 py-2" onClick={openModal}>
             Add Winner
           </Button>
         </div>
 
-        {/* Leaderboard Table */}
-        <Card>
+        <Card className="shadow-md">
           <CardContent className="p-4">
             <LeaderboardTable leaderboard={leaderboard} />
           </CardContent>
         </Card>
       </div>
 
-      {/* Modal Popup for Adding Winner */}
+      {/* Modal for Selecting Winner */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="p-6 rounded-xl">
+        <DialogContent className="p-6 rounded-xl shadow-lg">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-semibold">Select name of the winner</DialogTitle>
+            <DialogTitle className="text-2xl font-semibold">Select Name of the Winner</DialogTitle>
           </DialogHeader>
 
-          {/* Dropdown for selecting a winner */}
-          <Select value={winner} onValueChange={setWinner}>
-            <SelectTrigger className="mt-4 p-2 border rounded-md w-full">
-              <SelectValue placeholder="Select winner" />
-            </SelectTrigger>
-            <SelectContent>
-              {players.map((player, index) => (
-                <SelectItem key={index} value={player.username}>
-                  {player.username}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="mt-4 w-full">
+            <Select value={winner} onValueChange={setWinner}>
+              <SelectTrigger className="p-2 border rounded-md w-full">
+                <SelectValue placeholder="Select winner" />
+              </SelectTrigger>
+              <SelectContent>
+                {players.map((player, index) => (
+                  <SelectItem key={index} value={player.username}>
+                    {player.username}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-          {/* Error message */}
+          {/* Submit Error Message */}
           {submitError && (
             <div className="mt-4 text-red-600 font-semibold text-sm">{submitError}</div>
           )}
