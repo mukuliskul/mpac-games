@@ -28,7 +28,7 @@ export default function Enroll({
   const [error, setError] = useState<string | null>(null);
   const [gameSessions, setGameSessions] = useState<GameSession[]>([]);
   const [selectedDay, setSelectedDay] = useState<string>("Monday");
-  const [submitErrors, setSubmitErrors] = useState<Map<string, string>>(new Map());
+  const [submitErrors, setSubmitErrors] = useState<Map<number, string>>(new Map());
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [enrolledPlayers, setEnrolledPlayers] = useState<Player[]>([]);
   const [selectedUsername] = useAtom(usernameAtom);
