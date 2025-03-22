@@ -8,10 +8,11 @@ import { Spinner } from '@/components/ui/spinner';
 import { GameSession } from "@/lib/types/interfaces";
 import { convertTimetzTo12HourFormat, getWeekdayName } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useCallback } from 'react';
 import { Player } from "@/lib/types/interfaces";
 import { Eye } from "lucide-react";
+import { useAtom } from "jotai";
+import { usernameAtom } from "@/state/usernameAtom";
 
 // TODO: disable day selector for days that have passed
 
@@ -24,35 +25,12 @@ export default function Enroll({
 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [players, setPlayers] = useState<Player[]>([]);
   const [gameSessions, setGameSessions] = useState<GameSession[]>([]);
   const [selectedDay, setSelectedDay] = useState<string>("Monday");
-  const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
-  const [selectedSession, setSelectedSession] = useState<GameSession | null>(null);
-  const [userName, setUserName] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [enrolledPlayers, setEnrolledPlayers] = useState<Player[]>([]);
-
-  useEffect(() => {
-    async function fetchPlayers() {
-      try {
-        const response = await fetch("/api/players");
-        if (!response.ok) {
-          throw new Error("Failed to fetch players");
-        }
-        const data = await response.json();
-        setPlayers(data);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError('Failed to fetch players.');
-        } else {
-          setError('An unexpected error occurred.');
-        }
-      }
-    }
-    fetchPlayers();
-  }, []);
+  const [selectedUsername] = useAtom(usernameAtom);
 
   const fetchGameSessions = useCallback(async () => {
     setLoading(true);
@@ -89,12 +67,6 @@ export default function Enroll({
     return <div>{error}</div>;
   }
 
-  const openEnrollModal = (session: GameSession) => {
-    setSelectedSession(session);
-    setIsEnrollModalOpen(true);
-    setSubmitError(null);
-  };
-
   const openViewModal = async (session: GameSession) => {
     try {
       const response = await fetch(`/api/enroll?sessionId=${session.id}`);
@@ -107,24 +79,14 @@ export default function Enroll({
     setIsViewModalOpen(true);
   };
 
-  const handleCloseEnrollModal = () => {
-    setIsEnrollModalOpen(false);
-    setSubmitError(null);
-  };
-
-  const handleEnrollSubmit = async () => {
-    if (!userName.trim()) {
-      setSubmitError("Please enter your name");
-      return;
-    }
-
+  const handleEnrollSubmit = async (session: GameSession) => {
     try {
       const response = await fetch(`/api/enroll`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          sessionId: selectedSession?.id,
-          name: userName
+          sessionId: session?.id,
+          name: selectedUsername,
         }),
       });
 
@@ -136,8 +98,6 @@ export default function Enroll({
       }
 
       setSubmitError(null);
-      setIsEnrollModalOpen(false);
-      setUserName("");
       await fetchGameSessions();
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -185,44 +145,14 @@ export default function Enroll({
                   <Eye className="inline ml-2 cursor-pointer" onClick={() => openViewModal(session)} />
                 )}
               </p>
-              <Button className="w-full mt-2" onClick={() => openEnrollModal(session)}>Join Session</Button>
+              <Button className="w-full mt-2" onClick={() => handleEnrollSubmit(session)}>Join Session</Button>
+              {submitError && (
+                <div className="mt-4 text-red-600 font-semibold text-sm">{submitError}</div>
+              )}
             </CardContent>
           </Card>
         ))}
       </div>
-
-      {/* Modal Popup */}
-      <Dialog open={isEnrollModalOpen} onOpenChange={setIsEnrollModalOpen}>
-        <DialogContent className="p-6 rounded-xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-semibold">Join Game Session</DialogTitle>
-          </DialogHeader>
-
-          {/* Dropdown for selecting a name */}
-          <Select value={userName} onValueChange={setUserName}>
-            <SelectTrigger className="mt-4 p-2 border rounded-md w-full">
-              <SelectValue placeholder="Select your name" />
-            </SelectTrigger>
-            <SelectContent>
-              {players.map((player, index) => (
-                <SelectItem key={index} value={player.username}>
-                  {player.username}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Error message displayed inside the modal */}
-          {submitError && (
-            <div className="mt-4 text-red-600 font-semibold text-sm">{submitError}</div>
-          )}
-
-          <DialogFooter className="flex justify-end space-x-2 mt-4">
-            <Button variant="secondary" onClick={handleCloseEnrollModal}>Cancel</Button>
-            <Button onClick={handleEnrollSubmit} className="bg-blue-600 text-white">Submit</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Enrolled Players Modal */}
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
