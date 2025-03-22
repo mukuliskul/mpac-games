@@ -15,7 +15,6 @@ import { useAtom } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
 
 // TODO: disable day selector for days that have passed
-// TODO: disable enroll button if already in enrolled
 
 export default function Enroll({
   params,
@@ -120,14 +119,13 @@ export default function Enroll({
 
       if (!response.ok) {
         const errorData = await response.json();
-        // Make sure the error message is a string, not an object
         setSubmitErrors((prev) => new Map(prev).set(session.id, errorData?.message || "Failed to enroll"));
         return;
       }
 
       setSubmitErrors((prev) => {
         const updatedErrors = new Map(prev);
-        updatedErrors.delete(session.id); // Remove error for the specific session
+        updatedErrors.delete(session.id);
         return updatedErrors;
       });
       await fetchGameSessions();
