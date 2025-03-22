@@ -24,7 +24,7 @@ const NavBar = () => {
         <div className="flex items-center space-x-4">
           <h1
             className="text-2xl font-bold cursor-pointer hover:text-yellow-500 transition duration-300"
-            onClick={() => navigateTo('/')}
+            onClick={() => navigateTo('/home')}
           >
             MPACC Games
           </h1>
