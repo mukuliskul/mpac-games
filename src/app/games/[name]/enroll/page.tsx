@@ -15,6 +15,7 @@ import { useAtom } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
 
 // TODO: disable day selector for days that have passed
+// TODO: disable enroll button if already in enrolled
 
 export default function Enroll({
   params,
@@ -27,7 +28,7 @@ export default function Enroll({
   const [error, setError] = useState<string | null>(null);
   const [gameSessions, setGameSessions] = useState<GameSession[]>([]);
   const [selectedDay, setSelectedDay] = useState<string>("Monday");
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitErrors, setSubmitErrors] = useState<Map<string, string>>(new Map());
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [enrolledPlayers, setEnrolledPlayers] = useState<Player[]>([]);
   const [selectedUsername] = useAtom(usernameAtom);
@@ -93,17 +94,21 @@ export default function Enroll({
       if (!response.ok) {
         const errorData = await response.json();
         // Make sure the error message is a string, not an object
-        setSubmitError(errorData?.message || "Failed to enroll");
+        setSubmitErrors((prev) => new Map(prev).set(session.id, errorData?.message || "Failed to enroll"));
         return;
       }
 
-      setSubmitError(null);
+      setSubmitErrors((prev) => {
+        const updatedErrors = new Map(prev);
+        updatedErrors.delete(session.id); // Remove error for the specific session
+        return updatedErrors;
+      });
       await fetchGameSessions();
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setSubmitError(err.message);
+        setSubmitErrors((prev) => new Map(prev).set(session.id, err.message));
       } else {
-        setSubmitError("An unexpected error occurred. Please try again.");
+        setSubmitErrors((prev) => new Map(prev).set(session.id, "An unexpected error occurred. Please try again."));
       }
     }
   };
@@ -146,8 +151,8 @@ export default function Enroll({
                 )}
               </p>
               <Button className="w-full mt-2" onClick={() => handleEnrollSubmit(session)}>Join Session</Button>
-              {submitError && (
-                <div className="mt-4 text-red-600 font-semibold text-sm">{submitError}</div>
+              {submitErrors.has(session.id) && (
+                <div className="mt-4 text-red-600 font-semibold text-sm">{submitErrors.get(session.id)}</div>
               )}
             </CardContent>
           </Card>
