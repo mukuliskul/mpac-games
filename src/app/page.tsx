@@ -12,6 +12,14 @@ export default function Default() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  // Retrieve the selected player from localStorage when the component loads
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("selectedPlayer");
+    if (storedUsername) {
+      setSelectedPlayer(storedUsername);
+    }
+  }, [setSelectedPlayer]);
+
   useEffect(() => {
     async function fetchPlayers() {
       try {
@@ -34,6 +42,8 @@ export default function Default() {
 
   const handleProceed = () => {
     if (selectedPlayer) {
+      // Store the selected player in localStorage
+      localStorage.setItem("selectedPlayer", selectedPlayer);
       router.push("/home");
     }
   };
