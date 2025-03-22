@@ -47,7 +47,7 @@ export default function Default() {
       <h1 className="text-2xl mb-4">Select Your Username</h1>
       <select
         className="p-2 border rounded"
-        value={selectedPlayer}
+        value={selectedPlayer || ""}
         onChange={(e) => setSelectedPlayer(e.target.value)}
       >
         <option value="">-- Select Player --</option>
@@ -67,4 +67,3 @@ export default function Default() {
     </div>
   );
 }
-
