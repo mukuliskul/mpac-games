@@ -1,12 +1,16 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { useAtom } from "jotai";
+import { usernameAtom } from "@/state/usernameAtom";
 
 const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [selectedUsername] = useAtom(usernameAtom);
   const router = useRouter();
   const pathname = usePathname();
+
   const navigateTo = (path: string) => {
     router.push(path);
   };
@@ -24,7 +28,7 @@ const NavBar = () => {
         <div className="flex items-center space-x-4">
           <h1
             className="text-2xl font-bold cursor-pointer hover:text-yellow-500 transition duration-300"
-            onClick={() => navigateTo('/home')}
+            onClick={() => navigateTo("/home")}
           >
             MPACC Games
           </h1>
@@ -33,23 +37,32 @@ const NavBar = () => {
         {/* Desktop Menu */}
         <div className="hidden md:flex space-x-8">
           <button
-            onClick={() => navigateTo('/games')}
-            className={`text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive('/games') ? 'text-yellow-500 border-b-2 border-yellow-500' : ''}`}
+            onClick={() => navigateTo("/games")}
+            className={`text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive("/games") ? "text-yellow-500 border-b-2 border-yellow-500" : ""
+              }`}
           >
             Games
           </button>
           <button
-            onClick={() => navigateTo('/leaderboard')}
-            className={`text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive('/leaderboard') ? 'text-yellow-500 border-b-2 border-yellow-500' : ''}`}
+            onClick={() => navigateTo("/leaderboard")}
+            className={`text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive("/leaderboard") ? "text-yellow-500 border-b-2 border-yellow-500" : ""
+              }`}
           >
             Leaderboard
           </button>
         </div>
 
+        {/* Username Display */}
+        {selectedUsername && (
+          <div className="text-white font-medium">
+            Welcome, {selectedUsername}
+          </div>
+        )}
+
         {/* Mobile Menu Toggle */}
         <div className="md:hidden flex items-center">
           <button className="text-white text-2xl" onClick={toggleMenu}>
-            {menuOpen ? '✖' : '☰'}
+            {menuOpen ? "✖" : "☰"}
           </button>
         </div>
       </div>
@@ -58,14 +71,16 @@ const NavBar = () => {
       {menuOpen && (
         <div className="md:hidden flex flex-col space-y-4 mt-4 bg-gradient-to-r from-blue-800 to-indigo-900 p-4 rounded-lg border-t border-indigo-600 shadow-md transition-all ease-in-out duration-300">
           <button
-            onClick={() => navigateTo('/games')}
-            className={`text-white text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive('/games') ? 'text-yellow-500 border-b-2 border-yellow-500' : ''}`}
+            onClick={() => navigateTo("/games")}
+            className={`text-white text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive("/games") ? "text-yellow-500 border-b-2 border-yellow-500" : ""
+              }`}
           >
             Games
           </button>
           <button
-            onClick={() => navigateTo('/leaderboard')}
-            className={`text-white text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive('/leaderboard') ? 'text-yellow-500 border-b-2 border-yellow-500' : ''}`}
+            onClick={() => navigateTo("/leaderboard")}
+            className={`text-white text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive("/leaderboard") ? "text-yellow-500 border-b-2 border-yellow-500" : ""
+              }`}
           >
             Leaderboard
           </button>
