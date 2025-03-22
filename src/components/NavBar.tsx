@@ -1,23 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAtom } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
 
 const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [selectedUsername, setSelectedUsername] = useAtom(usernameAtom);
+  const [selectedUsername] = useAtom(usernameAtom);
   const router = useRouter();
   const pathname = usePathname();
-
-  // Load the username from localStorage if it exists
-  useEffect(() => {
-    const storedUsername = localStorage.getItem("selectedPlayer");
-    if (storedUsername && !selectedUsername) {
-      setSelectedUsername(storedUsername); // Update the atom if the value is in localStorage
-    }
-  }, [selectedUsername, setSelectedUsername]);
 
   const navigateTo = (path: string) => {
     router.push(path);
@@ -92,6 +84,7 @@ const NavBar = () => {
             Leaderboard
           </button>
 
+          {/* Welcome Message in Mobile Menu */}
           {selectedUsername && (
             <div className="text-white font-medium mt-4">
               Welcome, {selectedUsername}
