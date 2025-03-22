@@ -30,7 +30,8 @@ export default function Enroll({
   const [selectedDay, setSelectedDay] = useState<string>("Monday");
   const [submitErrors, setSubmitErrors] = useState<Map<number, string>>(new Map());
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [enrolledPlayers, setEnrolledPlayers] = useState<Player[]>([]);
+  const [selectedSession, setSelectedSession] = useState<GameSession | null>(null);
+  const [enrolledPlayers, setEnrolledPlayers] = useState<Map<number, Player[]>>(new Map());
   const [selectedUsername] = useAtom(usernameAtom);
 
   const fetchGameSessions = useCallback(async () => {
@@ -52,9 +53,34 @@ export default function Enroll({
     setLoading(false);
   }, [name]);
 
+  const fetchEnrolledPlayers = useCallback(async (session: GameSession) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/enroll?sessionId=${session.id}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch enrolled players");
+      }
+      const data = await response.json();
+      setEnrolledPlayers((prev) => new Map(prev).set(session.id, data));
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError("Failed to fetch enrolled players.");
+      } else {
+        setError("An unexpected error occurred.");
+      }
+    }
+    setLoading(false);
+  }, []);
+
   useEffect(() => {
     fetchGameSessions();
   }, [fetchGameSessions]);
+
+  useEffect(() => {
+    for (const session of gameSessions) {
+      fetchEnrolledPlayers(session);
+    }
+  }, [gameSessions, fetchEnrolledPlayers]);
 
   if (loading) {
     return (
@@ -72,12 +98,13 @@ export default function Enroll({
     try {
       const response = await fetch(`/api/enroll?sessionId=${session.id}`);
       if (!response.ok) throw new Error("Failed to fetch enrolled players");
-      setEnrolledPlayers(await response.json());
+      const data = await response.json();
+      setEnrolledPlayers((prev) => new Map(prev).set(session.id, data));
     } catch (err) {
       console.error(err);
-      setEnrolledPlayers([]);
     }
     setIsViewModalOpen(true);
+    setSelectedSession(session);
   };
 
   const handleEnrollSubmit = async (session: GameSession) => {
@@ -150,7 +177,16 @@ export default function Enroll({
                   <Eye className="inline ml-2 cursor-pointer" onClick={() => openViewModal(session)} />
                 )}
               </p>
-              <Button className="w-full mt-2" onClick={() => handleEnrollSubmit(session)}>Join Session</Button>
+              <Button
+                className="w-full mt-2"
+                onClick={() => handleEnrollSubmit(session)}
+                disabled={
+                  enrolledPlayers.has(session.id) &&
+                  enrolledPlayers.get(session.id)?.some(player => player.username === selectedUsername)
+                }
+              >
+                Join Session
+              </Button>
               {submitErrors.has(session.id) && (
                 <div className="mt-4 text-red-600 font-semibold text-sm">{submitErrors.get(session.id)}</div>
               )}
@@ -166,9 +202,15 @@ export default function Enroll({
             <DialogTitle className="text-2xl font-semibold">Enrolled Players</DialogTitle>
           </DialogHeader>
           <ul>
-            {enrolledPlayers.length > 0 ? enrolledPlayers.map((player, index) => (
-              <li key={index} className="py-1">{player.username}</li>
-            )) : <p>No players enrolled yet.</p>}
+            {
+              selectedSession && enrolledPlayers.has(selectedSession.id) && enrolledPlayers.get(selectedSession.id)!.length > 0 ? (
+                enrolledPlayers.get(selectedSession.id)!.map((player, index) => (
+                  <li key={index} className="py-1">{player.username}</li>
+                ))
+              ) : (
+                <p>No players enrolled yet.</p>
+              )
+            }
           </ul>
           <DialogFooter className="flex justify-end mt-4">
             <Button variant="secondary" onClick={() => setIsViewModalOpen(false)}>Close</Button>
