@@ -9,6 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import LeaderboardTable from "@/components/LeaderboardTable";
 import type { Game, Leaderboard, Player } from "@/lib/types/interfaces";
+import { useAtom } from "jotai";
+import { usernameAtom } from "@/state/usernameAtom";
 
 export default function GamePage({
   params,
@@ -23,6 +25,7 @@ export default function GamePage({
   const [winner, setWinner] = useState("");
   const [players, setPlayers] = useState<Player[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [selectedUsername] = useAtom(usernameAtom);
 
   // Fetch game details by name
   useEffect(() => {
@@ -168,9 +171,11 @@ export default function GamePage({
       <div className="mt-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-3xl font-bold">Leaderboard</h2>
-          <Button className="bg-blue-600 text-white px-4 py-2" onClick={openModal}>
-            Add Winner
-          </Button>
+          {selectedUsername?.toLowerCase() === "mukul" || selectedUsername?.toLowerCase() === "nina" ? (
+            <Button className="bg-blue-600 text-white px-4 py-2" onClick={openModal}>
+              Add Winner
+            </Button>
+          ) : null}
         </div>
 
         <Card className="shadow-md">
