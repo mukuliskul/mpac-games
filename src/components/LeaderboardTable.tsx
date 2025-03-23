@@ -1,4 +1,6 @@
 import React from 'react';
+import { useAtom } from 'jotai';
+import { usernameAtom } from "@/state/usernameAtom";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Leaderboard } from '@/lib/types/interfaces';
 
@@ -7,6 +9,8 @@ interface LeaderboardTableProps {
 }
 
 const LeaderboardTable: React.FC<LeaderboardTableProps> = ({ leaderboard }) => {
+  const [selectedUsername] = useAtom(usernameAtom);
+
   const sortedLeaderboard = [...leaderboard].sort((a, b) => {
     if (b.total_wins !== a.total_wins) {
       return b.total_wins - a.total_wins;
@@ -29,7 +33,10 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({ leaderboard }) => {
       </TableHeader>
       <TableBody>
         {sortedLeaderboard.map(({ username, total_wins }, index) => (
-          <TableRow key={username}>
+          <TableRow
+            key={username}
+            className={selectedUsername === username ? 'bg-yellow-200' : ''}
+          >
             <TableCell>{index + 1}</TableCell>
             <TableCell>{username}</TableCell>
             <TableCell>{total_wins}</TableCell>
@@ -41,4 +48,3 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({ leaderboard }) => {
 };
 
 export default LeaderboardTable;
-

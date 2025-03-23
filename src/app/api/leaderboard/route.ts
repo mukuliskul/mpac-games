@@ -25,8 +25,6 @@ export async function GET(request: Request) {
     .from("leaderboards")
     .select("username, total_wins:wins.sum(), last_updated:updated_at.max()")
 
-  console.log(totalWins);
-
   if (error) {
     console.error("Error fetching total wins:", error);
     return new Response("Error fetching data", { status: 500 });
