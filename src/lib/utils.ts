@@ -37,21 +37,15 @@ export function getWeekdayName(date: string): string {
 
 export function getMondayAndFridayOfThisWeek(): { monday: string, friday: string } {
   const currentDate = new Date();
-
-  // Get the current day of the week (0 - Sunday, 6 - Saturday)
   const currentDay = currentDate.getDay();
 
-  // Calculate the difference from Monday (Monday = 1)
-  const diffToMonday = currentDay === 0 ? -6 : 1 - currentDay;
-  const diffToFriday = currentDay === 0 ? 5 : 5 - currentDay;
-
-  // Get Monday's date
+  // Get Monday (first day of the current week)
   const monday = new Date(currentDate);
-  monday.setDate(currentDate.getDate() + diffToMonday);
+  monday.setDate(currentDate.getDate() - (currentDay === 0 ? 6 : currentDay - 1));
 
-  // Get Friday's date
-  const friday = new Date(currentDate);
-  friday.setDate(currentDate.getDate() + diffToFriday);
+  // Get Friday (fifth day of the current week)
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
 
   return {
     monday: monday.toDateString(),

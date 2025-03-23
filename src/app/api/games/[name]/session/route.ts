@@ -9,6 +9,10 @@ export async function GET(
   const { monday, friday } = getMondayAndFridayOfThisWeek();
   const formattedName = name.replace(/-/g, " ");
 
+  console.log("############")
+  console.log(monday, friday);
+  console.log("############")
+
   const { data: game_sessions, error } = await supabase
     .from('game_sessions')
     .select("*")
