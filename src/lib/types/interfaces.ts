@@ -1,10 +1,13 @@
+import { DaysOfWeek, GameMode, Role, TeamName } from "./enums";
+
 export interface Game {
   id: number;
   name: string;
   description: string;
   image_url: string;
   rules: string;
-  modes: string;
+  game_mode: GameMode[];
+  available_online: boolean;
 }
 
 export interface GameSession {
@@ -19,6 +22,9 @@ export interface GameSession {
 
 export interface Player {
   username: string;
+  team_name: TeamName;
+  days_in_office: DaysOfWeek[];
+  role: Role;
 };
 
 export interface Leaderboard {
