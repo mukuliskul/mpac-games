@@ -2,16 +2,16 @@ import { supabase } from "@/lib/supabase";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const sessionId = url.searchParams.get("sessionId");
+  const eventId = url.searchParams.get("eventId");
 
-  if (!sessionId) {
+  if (!eventId) {
     return new Response("Missing required fields", { status: 400 });
   }
 
   const { data, error } = await supabase
     .from("enrollments")
     .select("username")
-    .eq("game_session_id", sessionId);
+    .eq("event_id", eventId);
 
   if (error) {
     console.error("Error fetching enrollments", error);
@@ -22,17 +22,20 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { sessionId, name } = await request.json();
+  const { eventId, name } = await request.json();
 
-  if (!sessionId || !name) {
+  if (!eventId || !name) {
     return new Response("Missing required fields", { status: 400 });
   }
+
+  console.log(eventId);
+  console.log(name);
 
   const { data: existingUser, error: userError } = await supabase
     .from("enrollments")
     .select("username")
     .eq("username", name)
-    .eq("game_session_id", sessionId)
+    .eq("event_id", eventId)
     .single();
 
   if (userError) {
@@ -45,7 +48,7 @@ export async function POST(request: Request) {
 
 
   const { data, error } = await supabase.from("enrollments").insert([
-    { game_session_id: sessionId, username: name },
+    { event_id: eventId, username: name },
   ]);
 
 

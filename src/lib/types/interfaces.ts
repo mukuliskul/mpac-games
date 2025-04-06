@@ -1,4 +1,4 @@
-import { DaysOfWeek, GameMode, Role, TeamName } from "./enums";
+import { DaysOfWeek, EventEdition, EventStatus, GameMode, Role, TeamName } from "./enums";
 
 export interface Game {
   id: number;
@@ -8,6 +8,15 @@ export interface Game {
   rules: string;
   game_mode: GameMode[];
   available_online: boolean;
+}
+
+export interface Event {
+  id: number;
+  game_name: string;
+  enrolled_count: number;
+  edition: EventEdition
+  start_date: string;
+  event_status: EventStatus;
 }
 
 export interface GameSession {

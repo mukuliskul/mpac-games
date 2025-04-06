@@ -1,3 +1,12 @@
+export enum EventEdition {
+  Edition1 = "edition_1",
+}
+
+export enum EventStatus {
+  Open = "open",
+  Closed = "closed",
+}
+
 export enum GameMode {
   OneOnOne = "One-on-One",
   Tournament = "Tournament",

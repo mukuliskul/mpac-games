@@ -1,25 +1,26 @@
 "use client";
 
 import { use, useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import LeaderboardTable from "@/components/LeaderboardTable";
-import type { Game, Leaderboard, Player } from "@/lib/types/interfaces";
+import type { Game, Leaderboard, Player, Event } from "@/lib/types/interfaces";
 import { useAtom } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
+import { CURRENT_EDITION } from "@/lib/constants";
 
+// TODO: show game modes properly
 export default function GamePage({
   params,
 }: Readonly<{ params: Promise<{ name: string }> }>) {
-  const router = useRouter();
   const { name } = use(params);
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [event, setEvent] = useState<Event | null>(null);
   const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [winner, setWinner] = useState("");
@@ -67,6 +68,45 @@ export default function GamePage({
     fetchPlayers();
   }, []);
 
+  // Enroll player in the game
+  async function getEvent(
+    eventEdition: number = CURRENT_EDITION
+  ) {
+    try {
+      const response = await fetch(`/api/event?gameName=${name}&edition=${eventEdition}`);
+      if (!response.ok) throw new Error("Failed to fetch event");
+
+      const data = await response.json();
+      setEvent(data);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to fetch event.');
+    }
+  }
+  async function enrollPlayer() {
+    getEvent();
+    try {
+      const response = await fetch(`/api/enroll`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventId: event.id,
+          name: selectedUsername,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setSubmitError(errorData?.message || "Failed to enroll");
+        return;
+      }
+    } catch (err: unknown) {
+      console.error(err);
+      setSubmitError("An unexpected error occurred. Please try again.");
+    }
+  }
+
+
   // Fetch leaderboard for the game
   const fetchLeaderboard = useCallback(async () => {
     setLoading(true);
@@ -87,6 +127,17 @@ export default function GamePage({
   useEffect(() => {
     fetchLeaderboard();
   }, [fetchLeaderboard]);
+
+  // Handle enroll button click
+  const handleEnrollClick = async () => {
+    try {
+      await enrollPlayer();
+      alert("You have been successfully enrolled!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to enroll. Please try again.");
+    }
+  };
 
   // Modal open/close handlers
   const openModal = () => {
@@ -185,10 +236,12 @@ export default function GamePage({
         </Card>
       </div>
 
+      {/* TODO: Add disabled state for the button when the player is already enrolled */}
       {/* Enroll Button */}
       <div className="flex justify-center mt-6">
         <Button
-          onClick={() => router.push(`/games/${game.name.toLowerCase().replace(/\s+/g, '-')}/enroll`)}
+          onClick={handleEnrollClick}
+          // disabled={!event || event.enrolled_count >= event.max_players}
           className="w-full max-w-xs"
         >
           Enroll
