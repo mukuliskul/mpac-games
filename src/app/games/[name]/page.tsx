@@ -21,6 +21,7 @@ export default function GamePage({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [event, setEvent] = useState<Event | null>(null);
+  const [isAlreadyEnrolled, setIsAlreadyEnrolled] = useState(false);
   const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [winner, setWinner] = useState("");
@@ -49,6 +50,29 @@ export default function GamePage({
 
     fetchGameByName();
   }, [name]);
+
+  const checkIfEnrolled = useCallback(async () => {
+    if (!event || !selectedUsername) return;
+
+    try {
+      const response = await fetch(
+        `/api/enrollments?eventId=${event.id}&username=${selectedUsername}`
+      );
+
+      if (!response.ok) throw new Error("Failed to check enrollment");
+
+      const data = await response.json();
+      setIsAlreadyEnrolled(data?.length > 0); // true = already enrolled
+    } catch (err) {
+      console.error("Failed to check enrollment", err);
+      setIsAlreadyEnrolled(false); // fallback: allow enroll
+    }
+  }, [event, selectedUsername]);
+
+
+  useEffect(() => {
+    checkIfEnrolled();
+  }, [checkIfEnrolled]);
 
   // Fetch event by game name
   useEffect(() => {
@@ -135,6 +159,7 @@ export default function GamePage({
   const handleEnrollClick = async () => {
     try {
       await enrollPlayer();
+      await checkIfEnrolled();
     } catch (err) {
       console.error(err);
       alert("Failed to enroll. Please try again.");
@@ -243,10 +268,10 @@ export default function GamePage({
       <div className="flex justify-center mt-6">
         <Button
           onClick={handleEnrollClick}
-          // disabled={!event || event.enrolled_count >= event.max_players}
+          disabled={isAlreadyEnrolled}
           className="w-full max-w-xs"
         >
-          Enroll
+          {isAlreadyEnrolled ? "Already Enrolled" : "Enroll"}
         </Button>
       </div>
 
