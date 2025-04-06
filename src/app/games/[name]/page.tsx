@@ -50,6 +50,26 @@ export default function GamePage({
     fetchGameByName();
   }, [name]);
 
+  // Fetch event by game name
+  useEffect(() => {
+    async function fetchEvent(
+      edition: string = CURRENT_EDITION,
+    ) {
+      try {
+        const response = await fetch(`/api/event?gameName=${name}&edition=${edition}`);
+        if (!response.ok) throw new Error("Failed to fetch event");
+
+        const data = await response.json();
+        setEvent(data);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to fetch event.');
+      }
+    }
+
+    fetchEvent();
+  }, [name]);
+
   // Fetch players list
   useEffect(() => {
     async function fetchPlayers() {
@@ -68,23 +88,7 @@ export default function GamePage({
     fetchPlayers();
   }, []);
 
-  // Enroll player in the game
-  async function getEvent(
-    eventEdition: number = CURRENT_EDITION
-  ) {
-    try {
-      const response = await fetch(`/api/event?gameName=${name}&edition=${eventEdition}`);
-      if (!response.ok) throw new Error("Failed to fetch event");
-
-      const data = await response.json();
-      setEvent(data);
-    } catch (err) {
-      console.error(err);
-      setError('Failed to fetch event.');
-    }
-  }
   async function enrollPlayer() {
-    getEvent();
     try {
       const response = await fetch(`/api/enroll`, {
         method: "POST",
@@ -105,7 +109,6 @@ export default function GamePage({
       setSubmitError("An unexpected error occurred. Please try again.");
     }
   }
-
 
   // Fetch leaderboard for the game
   const fetchLeaderboard = useCallback(async () => {
@@ -132,7 +135,6 @@ export default function GamePage({
   const handleEnrollClick = async () => {
     try {
       await enrollPlayer();
-      alert("You have been successfully enrolled!");
     } catch (err) {
       console.error(err);
       alert("Failed to enroll. Please try again.");
