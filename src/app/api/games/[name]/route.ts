@@ -1,5 +1,12 @@
 import { supabase } from "@/lib/supabase";
 
+/**
+ * GET /api/games/[name]
+ *
+ * name: string
+ * Retrieves a game by its name.
+*/
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ name: string }> }

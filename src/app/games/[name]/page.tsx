@@ -12,7 +12,6 @@ import { useAtom } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
 import { CURRENT_EDITION } from "@/lib/constants";
 
-// TODO: show game modes properly
 export default function GamePage({
   params,
 }: Readonly<{ params: Promise<{ name: string }> }>) {
@@ -255,11 +254,12 @@ export default function GamePage({
       <Card className="mb-6 p-4 shadow-md">
         <h2 className="text-2xl font-semibold mb-4">Description</h2>
         <p className="text-lg">{game.description}</p>
+        <p className="text-lg mt-4">{game.modes}</p>
 
-        {game.game_modes && (
+        {game.modes && (
           <>
             <h2 className="text-2xl font-semibold mt-6 mb-4">Game Modes</h2>
-            <p className="text-lg">{game.game_modes}</p>
+            <p className="text-lg">{game.modes.join(', ')}</p>
           </>
         )}
       </Card>

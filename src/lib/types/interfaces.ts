@@ -6,7 +6,7 @@ export interface Game {
   description: string;
   image_url: string;
   rules: string;
-  game_modes: GameMode[];
+  modes: GameMode[];
   available_online: boolean;
 }
 
