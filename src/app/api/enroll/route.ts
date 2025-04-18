@@ -27,6 +27,7 @@ export async function GET(request: Request) {
   let data: Enrollment[] | Enrollment | null = null;
   let error: Error | null = null;
   let errorMessage: string | null = null;
+  let errorStatusCode: number = 500;
 
   if (eventId && !username) {
     const result = await supabase
@@ -45,14 +46,15 @@ export async function GET(request: Request) {
       .single();
     data = result.data;
     error = result.error;
-    errorMessage = "Error fetching enrollment for event by user";
+    errorMessage = "Player not enrolled in event";
+    errorStatusCode = 404;
   } else {
     return new Response("Missing required fields", { status: 400 });
   }
 
   if (error) {
     console.error(errorMessage, error);
-    return new Response("Error fetching enrollments", { status: 500 });
+    return new Response("Error fetching enrollments", { status: errorStatusCode });
   }
 
   return new Response(JSON.stringify(data), {
@@ -67,9 +69,6 @@ export async function POST(request: Request) {
   if (!eventId || !name) {
     return new Response("Missing required fields", { status: 400 });
   }
-
-  console.log(eventId);
-  console.log(name);
 
   const { data: existingUser, error: userError } = await supabase
     .from("enrollments")

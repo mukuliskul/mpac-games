@@ -51,30 +51,6 @@ export default function GamePage({
     fetchGameByName();
   }, [name]);
 
-  const checkIfEnrolled = useCallback(async () => {
-    if (!event || !selectedUsername) return;
-
-    try {
-      const response = await fetch(
-        `/api/enroll?eventId=${event.id}&username=${selectedUsername}`
-      );
-
-      console.log(response);
-      if (!response.ok) throw new Error("Failed to check enrollment");
-
-      const data = await response.json();
-      setIsAlreadyEnrolled(!!data && data.username && data.event_id); // True: already enrolled
-    } catch (err) {
-      console.error("Failed to check enrollment", err);
-      setIsAlreadyEnrolled(false); // fallback: allow enroll
-    }
-  }, [event, selectedUsername]);
-
-
-  useEffect(() => {
-    checkIfEnrolled();
-  }, [checkIfEnrolled]);
-
   // Fetch event by game name
   useEffect(() => {
     async function fetchEvent(
@@ -94,6 +70,44 @@ export default function GamePage({
 
     fetchEvent();
   }, [name]);
+
+  const checkIfEnrolled = useCallback(async () => {
+    if (!event || !selectedUsername) return;
+
+    try {
+      const response = await fetch(
+        `/api/enroll?eventId=${event.id}&username=${selectedUsername}`
+      );
+
+      console.log(response);
+
+      if (!response.ok) {
+        // Check for specific status or handle response status accordingly
+        if (response.status === 404) {
+          // Player not found, mark as not enrolled
+          setIsAlreadyEnrolled(false);
+          return;
+        }
+        throw new Error("Failed to check enrollment");
+      }
+
+      const data = await response.json();
+
+      // If data is empty or doesn't contain the expected fields
+      if (data || data.username || data.event_id) {
+        setIsAlreadyEnrolled(true); // Player is enrolled
+      }
+    } catch (err) {
+      console.error("Failed to check enrollment", err);
+      setIsAlreadyEnrolled(false); // Fallback: allow enroll
+    }
+  }, [event, selectedUsername]);
+
+  useEffect(() => {
+    checkIfEnrolled();
+  }, [checkIfEnrolled]);
+
+  // TODO: fix multiple jotai instances
 
   // Fetch players list
   useEffect(() => {
