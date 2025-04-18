@@ -9,7 +9,7 @@ import { Enrollment } from "@/lib/types/interfaces";
  *
  *
  * eventId: string, username: string
- * Return boolean if the user is already enrolled in the event.
+ * Returns a specific enrollment for a user in an event.
  *
  * @param request - The HTTP request object.
  * @returns A greeting message.
