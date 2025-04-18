@@ -56,13 +56,14 @@ export default function GamePage({
 
     try {
       const response = await fetch(
-        `/api/enrollments?eventId=${event.id}&username=${selectedUsername}`
+        `/api/enroll?eventId=${event.id}&username=${selectedUsername}`
       );
 
+      console.log(response);
       if (!response.ok) throw new Error("Failed to check enrollment");
 
       const data = await response.json();
-      setIsAlreadyEnrolled(data?.length > 0); // true = already enrolled
+      setIsAlreadyEnrolled(!!data && data.username && data.event_id); // True: already enrolled
     } catch (err) {
       console.error("Failed to check enrollment", err);
       setIsAlreadyEnrolled(false); // fallback: allow enroll
@@ -113,6 +114,10 @@ export default function GamePage({
   }, []);
 
   async function enrollPlayer() {
+    if (!event) {
+      setSubmitError("Event not found");
+      return;
+    }
     try {
       const response = await fetch(`/api/enroll`, {
         method: "POST",
@@ -237,10 +242,10 @@ export default function GamePage({
         <h2 className="text-2xl font-semibold mb-4">Description</h2>
         <p className="text-lg">{game.description}</p>
 
-        {game.modes && (
+        {game.game_modes && (
           <>
             <h2 className="text-2xl font-semibold mt-6 mb-4">Game Modes</h2>
-            <p className="text-lg">{game.modes}</p>
+            <p className="text-lg">{game.game_modes}</p>
           </>
         )}
       </Card>
@@ -263,7 +268,6 @@ export default function GamePage({
         </Card>
       </div>
 
-      {/* TODO: Add disabled state for the button when the player is already enrolled */}
       {/* Enroll Button */}
       <div className="flex justify-center mt-6">
         <Button

@@ -17,8 +17,6 @@ export async function GET(request: Request) {
     .eq("edition", edition)
     .single();
 
-  console.log("Data:", data);
-
   if (error) {
     console.error("Error fetching event", error);
     return new Response("Error fetching event", { status: 500 });

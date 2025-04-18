@@ -6,7 +6,7 @@ export interface Game {
   description: string;
   image_url: string;
   rules: string;
-  game_mode: GameMode[];
+  game_modes: GameMode[];
   available_online: boolean;
 }
 
@@ -17,6 +17,12 @@ export interface Event {
   edition: EventEdition
   start_date: string;
   event_status: EventStatus;
+}
+
+export interface Enrollment {
+  id: number;
+  event_id: number;
+  username: string;
 }
 
 export interface GameSession {
