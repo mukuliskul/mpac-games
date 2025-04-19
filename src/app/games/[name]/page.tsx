@@ -11,6 +11,7 @@ import type { Game, Leaderboard, Player, Event } from "@/lib/types/interfaces";
 import { useAtom } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
 import { CURRENT_EDITION } from "@/lib/constants";
+import { checkEnrollmentOpen } from "@/lib/utils";
 
 export default function GamePage({
   params,
@@ -105,8 +106,6 @@ export default function GamePage({
   useEffect(() => {
     checkIfEnrolled();
   }, [checkIfEnrolled]);
-
-  // TODO: fix multiple jotai instances
 
   // Fetch players list
   useEffect(() => {
@@ -245,6 +244,8 @@ export default function GamePage({
     return <div className="text-center">Game not found!</div>;
   }
 
+  const isEnrollmentOpen = checkEnrollmentOpen();
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       {/* Game Title */}
@@ -286,10 +287,14 @@ export default function GamePage({
       <div className="flex justify-center mt-6">
         <Button
           onClick={handleEnrollClick}
-          disabled={isAlreadyEnrolled}
+          disabled={isAlreadyEnrolled || !isEnrollmentOpen}  // Disable if already enrolled or enrollment is closed
           className="w-full max-w-xs"
         >
-          {isAlreadyEnrolled ? "Already Enrolled" : "Enroll"}
+          {isAlreadyEnrolled
+            ? "Already Enrolled"
+            : !isEnrollmentOpen
+              ? "Enrollment Closed"
+              : "Enroll"}
         </Button>
       </div>
 

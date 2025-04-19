@@ -1,9 +1,19 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { ENROLLMENT_END_DATE } from "./constants";
+import { DateTime } from 'luxon';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
+export function checkEnrollmentOpen(): boolean {
+  const currentDate = DateTime.now().setZone("America/New_York");
+  const endEnrollmentDate = DateTime.fromISO(ENROLLMENT_END_DATE, { zone: "America/New_York" });
+
+  return currentDate.toMillis() < endEnrollmentDate.toMillis();
+}
+
 
 export function convertTimetzTo12HourFormat(timetz: string): string {
   // Match the parts: HH:MM:SS and timezone offset (e.g., -05)
