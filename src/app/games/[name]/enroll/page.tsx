@@ -1,6 +1,11 @@
+"use client";
+
+export default function Placeholder() {
+  return null;
+}
+
 // DISCONTINUED
 
-// "use client";
 //
 // import { use } from "react";
 // import { useState, useEffect } from "react";
