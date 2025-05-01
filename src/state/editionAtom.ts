@@ -5,7 +5,7 @@ export const currentEditionAtom = atom<string | null>(null);
 export const enrollmentEndDateAtom = atom<string | null>(null);
 
 const fetchConfigAtom = atom(async () => {
-  const res = await fetch("/api/editions/active");
+  const res = await fetch("/api/edition/active");
   if (!res.ok) throw new Error("Failed to fetch config");
 
   const active_edition: Edition = await res.json();

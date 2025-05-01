@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 
 /**
- * GET /api/editions/active
+ * GET /api/edition/active
  *
  * Retrieves active edition
  */

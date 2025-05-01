@@ -1,5 +1,5 @@
 /**
- * GET /api/editions
+ * GET /api/edition
  *
  * Retrieves active edition
  */
