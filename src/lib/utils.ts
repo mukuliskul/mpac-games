@@ -1,17 +1,24 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { ENROLLMENT_END_DATE } from "./constants";
 import { DateTime } from 'luxon';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function checkEnrollmentOpen(): boolean {
-  const currentDate = DateTime.now().setZone("America/New_York");
-  const endEnrollmentDate = DateTime.fromISO(ENROLLMENT_END_DATE, { zone: "America/New_York" });
+/**
+ * Check if enrollment is still open
+ * @param enrollmentEndDate ISO string, e.g. "2025-04-30"
+ */
+export function checkEnrollmentOpen(enrollmentEndDate: string | null): boolean {
+  if (!enrollmentEndDate) return false;
 
-  return currentDate.toMillis() < endEnrollmentDate.toMillis();
+  const currentDate = DateTime.now().setZone("America/New_York");
+  const endDate = DateTime.fromISO(enrollmentEndDate, {
+    zone: "America/New_York",
+  });
+
+  return currentDate.toMillis() < endDate.toMillis();
 }
 
 

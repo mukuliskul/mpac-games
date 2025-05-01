@@ -1,7 +1,3 @@
-export enum EventEdition {
-  Edition1 = "edition_1",
-}
-
 export enum EventStatus {
   Open = "open",
   Closed = "closed",

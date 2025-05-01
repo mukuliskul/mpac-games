@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { usernameAtom } from "@/state/usernameAtom";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Leaderboard } from '@/lib/types/interfaces';
@@ -9,7 +9,7 @@ interface LeaderboardTableProps {
 }
 
 const LeaderboardTable: React.FC<LeaderboardTableProps> = ({ leaderboard }) => {
-  const [selectedUsername] = useAtom(usernameAtom);
+  const selectedUsername = useAtomValue(usernameAtom);
 
   const sortedLeaderboard = [...leaderboard].sort((a, b) => {
     if (b.total_wins !== a.total_wins) {

@@ -37,7 +37,7 @@ export default function Placeholder() {
 //   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 //   const [selectedSession, setSelectedSession] = useState<GameSession | null>(null);
 //   const [enrolledPlayers, setEnrolledPlayers] = useState<Map<number, Player[]>>(new Map());
-//   const [selectedUsername] = useAtom(usernameAtom);
+//   const selectedUsername = useAtomValue(usernameAtom);
 //
 //   const fetchGameSessions = useCallback(async () => {
 //     setLoading(true);

@@ -8,9 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import LeaderboardTable from "@/components/LeaderboardTable";
 import type { Game, Leaderboard, Player, Event } from "@/lib/types/interfaces";
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
-import { CURRENT_EDITION } from "@/lib/constants";
+import { currentEditionAtom, enrollmentEndDateAtom } from "@/state/editionAtom";
 import { checkEnrollmentOpen } from "@/lib/utils";
 
 export default function GamePage({
@@ -21,13 +21,16 @@ export default function GamePage({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [event, setEvent] = useState<Event | null>(null);
+  const [isEnrollmentOpen, setIsEnrollmentOpen] = useState<boolean>(false);
   const [isAlreadyEnrolled, setIsAlreadyEnrolled] = useState(false);
   const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [winner, setWinner] = useState("");
   const [players, setPlayers] = useState<Player[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [selectedUsername] = useAtom(usernameAtom);
+  const selectedUsername = useAtomValue(usernameAtom);
+  const currentEdition = useAtomValue(currentEditionAtom)!
+  const endEnrollmentDate = useAtomValue(enrollmentEndDateAtom)!
 
   // Fetch game details by name
   useEffect(() => {
@@ -53,14 +56,18 @@ export default function GamePage({
 
   // Fetch event by game name
   useEffect(() => {
-    async function fetchEvent(
-      edition: string = CURRENT_EDITION,
-    ) {
+    async function fetchEvent(edition: string = currentEdition) {
       try {
         const response = await fetch(`/api/event?gameName=${name}&edition=${edition}`);
         if (!response.ok) throw new Error("Failed to fetch event");
 
         const data = await response.json();
+
+        if (!data || Object.keys(data).length === 0) {
+          setError("Event not found.");
+          return;
+        }
+
         setEvent(data);
       } catch (err) {
         console.error(err);
@@ -69,7 +76,7 @@ export default function GamePage({
     }
 
     fetchEvent();
-  }, [name]);
+  }, [name, currentEdition]);
 
   const checkIfEnrolled = useCallback(async () => {
     if (!event || !selectedUsername) return;
@@ -150,6 +157,15 @@ export default function GamePage({
       setSubmitError("An unexpected error occurred. Please try again.");
     }
   }
+
+  // **Ensure the enrollment check happens only on the client side**
+  useEffect(() => {
+    if (typeof window !== "undefined" && endEnrollmentDate) {
+      const isOpen = checkEnrollmentOpen(endEnrollmentDate);
+      setIsEnrollmentOpen(isOpen);
+    }
+  }, [endEnrollmentDate]);
+
 
   // Fetch leaderboard for the game
   const fetchLeaderboard = useCallback(async () => {
@@ -243,8 +259,6 @@ export default function GamePage({
   if (!game) {
     return <div className="text-center">Game not found!</div>;
   }
-
-  const isEnrollmentOpen = checkEnrollmentOpen();
 
   return (
     <div className="max-w-4xl mx-auto p-6">

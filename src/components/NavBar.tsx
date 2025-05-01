@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
 
 const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [selectedUsername] = useAtom(usernameAtom);
+  const selectedUsername = useAtomValue(usernameAtom);
   const router = useRouter();
   const pathname = usePathname();
 
