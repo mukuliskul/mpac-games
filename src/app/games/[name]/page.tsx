@@ -56,9 +56,14 @@ export default function GamePage({
 
   // Fetch event by game name
   useEffect(() => {
-    async function fetchEvent(edition: string = currentEdition) {
+    async function fetchEvent() {
       try {
-        const response = await fetch(`/api/event?gameName=${name}&edition=${edition}`);
+        // Wait for currentEdition to load
+        if (!currentEdition) {
+          return;
+        }
+
+        const response = await fetch(`/api/event?gameName=${name}&edition=${currentEdition}`);
         if (!response.ok) throw new Error("Failed to fetch event");
 
         const data = await response.json();

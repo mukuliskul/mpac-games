@@ -9,7 +9,7 @@ export async function GET() {
   const { data, error } = await supabase
     .from("edition")
     .select("*")
-    .eq("is_active", "True")
+    .eq("is_active", true)
     .single();
 
   if (error) {

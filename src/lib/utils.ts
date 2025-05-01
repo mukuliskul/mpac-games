@@ -20,7 +20,6 @@ export function checkEnrollmentOpen(enrollmentEndDate: string | null): boolean {
 
   return currentDate.toMillis() < endDate.toMillis();
 }
-sx
 
 export function convertTimetzTo12HourFormat(timetz: string): string {
   // Match the parts: HH:MM:SS and timezone offset (e.g., -05)
