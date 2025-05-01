@@ -86,8 +86,6 @@ export default function GamePage({
         `/api/enroll?eventId=${event.id}&username=${selectedUsername}`
       );
 
-      console.log(response);
-
       if (!response.ok) {
         // Check for specific status or handle response status accordingly
         if (response.status === 404) {
