@@ -12,7 +12,7 @@ const fetchConfigAtom = atom(async () => {
 
   return {
     currentEdition: active_edition.name,
-    enrollmentEndDate: active_edition.end_date,
+    enrollmentEndDate: active_edition.start_date,
   };
 });
 

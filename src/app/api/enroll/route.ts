@@ -6,37 +6,50 @@ import { Enrollment } from "@/lib/types/interfaces";
  *
  * eventId: string
  * Retrieves a list of enrollments for a specific event.
- *
+ * count: boolean
+ * Returns the count of enrollments for the event if true.
  *
  * eventId: string, username: string
  * Returns a specific enrollment for a user in an event.
  *
- * @param request - The HTTP request object.
- * @returns A greeting message.
  */
 export async function GET(request: Request) {
-
   const url = new URL(request.url);
   const eventId = url.searchParams.get("eventId");
   const username = url.searchParams.get("username");
+  const countParam = url.searchParams.get("count");
 
   if (!eventId) {
     return new Response("Missing required fields", { status: 400 });
   }
 
-  let data: Enrollment[] | Enrollment | null = null;
+  let data: Enrollment[] | number | Enrollment | null = null;
   let error: Error | null = null;
   let errorMessage: string | null = null;
   let errorStatusCode: number = 500;
 
   if (eventId && !username) {
-    const result = await supabase
-      .from("enrollments")
-      .select("*")
-      .eq("event_id", eventId);
-    data = result.data;
-    error = result.error;
-    errorMessage = "Error fetching enrollments for event";
+    if (countParam?.toLowerCase() === "true") {
+      // Fetch count of enrollments for the event
+      const result = await supabase
+        .from("enrollments")
+        .select("id", { count: "exact", head: true })
+        .eq("event_id", eventId);
+
+      data = result.count;
+      error = result.error;
+      errorMessage = "Error fetching count of enrollments for event";
+    } else {
+      // Fetch the list of enrollments for the event
+      const result = await supabase
+        .from("enrollments")
+        .select("*")
+        .eq("event_id", eventId);
+
+      data = result.data;
+      error = result.error;
+      errorMessage = "Error fetching enrollments for event";
+    }
   } else if (eventId && username) {
     const result = await supabase
       .from("enrollments")
@@ -44,6 +57,7 @@ export async function GET(request: Request) {
       .eq("event_id", eventId)
       .eq("username", username)
       .single();
+
     data = result.data;
     error = result.error;
     errorMessage = "Player not enrolled in event";

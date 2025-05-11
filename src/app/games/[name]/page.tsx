@@ -1,5 +1,6 @@
 "use client";
 
+import { Users } from "lucide-react";
 import { use, useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,6 +24,7 @@ export default function GamePage({
   const [event, setEvent] = useState<Event | null>(null);
   const [isEnrollmentOpen, setIsEnrollmentOpen] = useState<boolean>(false);
   const [isAlreadyEnrolled, setIsAlreadyEnrolled] = useState(false);
+  const [enrolledPlayersCount, setEnrolledPlayersCount] = useState(0);
   const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [winner, setWinner] = useState("");
@@ -117,6 +119,33 @@ export default function GamePage({
     checkIfEnrolled();
   }, [checkIfEnrolled]);
 
+  const checkTotalEnrollmentCount = useCallback(async () => {
+    if (!event) return;
+
+    try {
+      const response = await fetch(
+        `/api/enroll?eventId=${event.id}&count=True`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to check total enrollment count");
+      }
+
+      const data = await response.json();
+      if (typeof data === "number") {
+        setEnrolledPlayersCount(data);
+      } else {
+        console.warn("Unexpected data type for enrolled player count:", data);
+      }
+    } catch (err) {
+      console.error("Failed to check total enrollment count", err);
+    }
+  }, [event]);
+
+  useEffect(() => {
+    checkTotalEnrollmentCount();
+  }, [checkTotalEnrollmentCount]);
+
   // Fetch players list
   useEffect(() => {
     async function fetchPlayers() {
@@ -196,6 +225,7 @@ export default function GamePage({
     try {
       await enrollPlayer();
       await checkIfEnrolled();
+      await checkTotalEnrollmentCount();
     } catch (err) {
       console.error(err);
       alert("Failed to enroll. Please try again.");
@@ -301,11 +331,11 @@ export default function GamePage({
       </div>
 
       {/* Enroll Button */}
-      <div className="flex justify-center mt-6">
+      <div className="flex flex-col items-center mt-6 space-y-2 text-sm text-muted-foreground">
         <Button
           onClick={handleEnrollClick}
-          disabled={isAlreadyEnrolled || !isEnrollmentOpen}  // Disable if already enrolled or enrollment is closed
-          className="w-full max-w-xs"
+          disabled={isAlreadyEnrolled || !isEnrollmentOpen}
+          className="w-full max-w-xs text-base font-medium"
         >
           {isAlreadyEnrolled
             ? "Already Enrolled"
@@ -313,6 +343,12 @@ export default function GamePage({
               ? "Enrollment Closed"
               : "Enroll"}
         </Button>
+
+        {/* Player Count */}
+        <div className="flex items-center">
+          <Users className="w-4 h-4 mr-1" />
+          <span className="tracking-tight">{enrolledPlayersCount} players enrolled</span>
+        </div>
       </div>
 
       {/* Modal for Selecting Winner */}
