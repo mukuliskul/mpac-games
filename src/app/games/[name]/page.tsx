@@ -90,7 +90,7 @@ export default function GamePage({
 
     try {
       const response = await fetch(
-        `/api/enroll?eventId=${event.id}&username=${selectedUsername}`
+        `/api/enroll/${event.id}/${selectedUsername}`
       );
 
       if (!response.ok) {
@@ -124,7 +124,7 @@ export default function GamePage({
 
     try {
       const response = await fetch(
-        `/api/enroll?eventId=${event.id}&count=True`
+        `/api/enroll/${event.id}/count`
       );
 
       if (!response.ok) {
@@ -132,11 +132,7 @@ export default function GamePage({
       }
 
       const data = await response.json();
-      if (typeof data === "number") {
-        setEnrolledPlayersCount(data);
-      } else {
-        console.warn("Unexpected data type for enrolled player count:", data);
-      }
+      setEnrolledPlayersCount(data.count);
     } catch (err) {
       console.error("Failed to check total enrollment count", err);
     }
@@ -347,7 +343,9 @@ export default function GamePage({
         {/* Player Count */}
         <div className="flex items-center">
           <Users className="w-4 h-4 mr-1" />
-          <span className="tracking-tight">{enrolledPlayersCount} players enrolled</span>
+          <span className="tracking-tight">
+            {enrolledPlayersCount} {enrolledPlayersCount === 1 ? "player" : "players"} enrolled
+          </span>
         </div>
       </div>
 
