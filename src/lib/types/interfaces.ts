@@ -45,7 +45,7 @@ export interface GameSession {
 
 export interface Player {
   username: string;
-  team_name: TeamName;
+  team: TeamName;
   days_in_office: DaysOfWeek[];
   role: Role;
 };

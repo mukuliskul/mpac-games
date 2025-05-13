@@ -20,7 +20,7 @@ export async function getEnrolledPlayers(eventId: string): Promise<Player[]> {
   // Step 2: Fetch players from players table
   const { data: players, error: playersError } = await supabase
     .from('players')
-    .select('username, team_name, days_in_office, role')
+    .select('username, team, days_in_office, role')
     .in('username', usernames);
 
   if (playersError) {
