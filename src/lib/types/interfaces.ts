@@ -50,6 +50,13 @@ export interface Player {
   role: Role;
 };
 
+export interface Match {
+  player1: Player;
+  player2: Player;
+  round: number;
+  date: Date;
+}
+
 export interface Leaderboard {
   username: string;
   total_wins: number;

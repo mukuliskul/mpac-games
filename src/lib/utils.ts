@@ -21,6 +21,31 @@ export function checkEnrollmentOpen(enrollmentEndDate: string | null): boolean {
   return currentDate.toMillis() < endDate.toMillis();
 }
 
+interface Holiday {
+  date: string;
+  name: string;
+  provinces: { id: string }[];
+}
+
+export async function isHoliday(): Promise<Set<string>> {
+  const res = await fetch(`https://canada-holidays.ca/api/v1/holidays`);
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch holidays');
+  }
+
+  const responseBody = await res.json();
+  const holidays: Holiday[] = responseBody.holidays;
+
+  // Filter holidays that include Ontario (ON)
+  const ontarioHolidays = holidays.filter(holiday =>
+    holiday.provinces.some(province => province.id === 'ON')
+  );
+
+  // Return a set of Ontario holiday dates
+  return new Set(ontarioHolidays.map(h => h.date));
+}
+
 export function convertTimetzTo12HourFormat(timetz: string): string {
   // Match the parts: HH:MM:SS and timezone offset (e.g., -05)
   const match = timetz.match(/^(\d{2}:\d{2}(:\d{2})?)([+-]\d{2})$/);
