@@ -21,12 +21,6 @@ export function checkEnrollmentOpen(enrollmentEndDate: string | null): boolean {
   return currentDate.toMillis() < endDate.toMillis();
 }
 
-interface Holiday {
-  date: string;
-  name: string;
-  provinces: { id: string }[];
-}
-
 export async function isHoliday(): Promise<Set<string>> {
   const res = await fetch(`https://canada-holidays.ca/api/v1/holidays`);
 
@@ -34,15 +28,17 @@ export async function isHoliday(): Promise<Set<string>> {
     throw new Error('Failed to fetch holidays');
   }
 
-  const responseBody = await res.json();
-  const holidays: Holiday[] = responseBody.holidays;
+  const responseBody: {
+    holidays: Array<{
+      date: string;
+      provinces: Array<{ id: string }>;
+    }>;
+  } = await res.json();
 
-  // Filter holidays that include Ontario (ON)
-  const ontarioHolidays = holidays.filter(holiday =>
+  const ontarioHolidays = responseBody.holidays.filter(holiday =>
     holiday.provinces.some(province => province.id === 'ON')
   );
 
-  // Return a set of Ontario holiday dates
   return new Set(ontarioHolidays.map(h => h.date));
 }
 
