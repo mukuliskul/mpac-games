@@ -14,8 +14,8 @@ export interface Edition {
   id: number;
   name: string;
   is_active: boolean;
-  start_date: string;
-  end_date: string;
+  enrollment_end_date: string;
+  edition_start_date: string;
 }
 
 export interface Event {
@@ -54,7 +54,7 @@ export interface Match {
   player1: Player;
   player2: Player;
   round: number;
-  date: Date;
+  date: string;
 }
 
 export interface Leaderboard {

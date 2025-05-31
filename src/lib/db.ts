@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { Player } from './types/interfaces';
+import { formatInTimeZone } from "date-fns-tz";
 
 export async function getEnrolledPlayers(eventId: string): Promise<Player[]> {
   // Step 1: Get usernames from enrollments
@@ -30,16 +31,21 @@ export async function getEnrolledPlayers(eventId: string): Promise<Player[]> {
   return players as Player[];
 }
 
-export async function isPlayerBusyOnDate(username: string, date: Date, eventId: string): Promise<boolean> {
-  const dateStr = date.toISOString().split('T')[0];
+export async function isPlayerBusyOnDate(username: string, dateStr: str): Promise<boolean> {
+  console.log(`Checking if player ${username} is busy on date ${dateStr}`);
 
   const { data, error } = await supabase
     .from('game_sessions')
     .select('id')
     .eq('match_date', dateStr)
-    .eq('player1_username', username)
-    .neq('event_id', eventId)
+    .or(`player1_username.eq.${username}, player2_username.eq.${username}`)
     .limit(1);
+  // .neq('event_id', eventId); TODO: this shouldnt be needed since it doesnt matter as long as the player is busy
+
+
+  console.log("Data:", data);
+  console.log("--------------")
+
 
   if (error) throw new Error(`Error checking busy date: ${error.message}`);
   return data.length > 0;
@@ -48,20 +54,22 @@ export async function isPlayerBusyOnDate(username: string, date: Date, eventId: 
 export async function insertGameSession(params: {
   eventId: string;
   round: number;
-  matchDate: Date;
+  matchDate: string;
   player1: string;
   player2: string;
+  winner?: string | null;
 }) {
-  const { eventId, round, matchDate, player1, player2 } = params;
+  const { eventId, round, matchDate, player1, player2, winner } = params;
 
   const { error } = await supabase
     .from('game_sessions')
     .insert({
       event_id: eventId,
       round,
-      match_date: matchDate.toISOString().split('T')[0],
+      match_date: matchDate,
       player1_username: player1,
       player2_username: player2,
+      winner_username: winner ?? null,
     });
 
   if (error) throw new Error(`Error inserting match: ${error.message}`);
