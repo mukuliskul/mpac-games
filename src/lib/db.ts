@@ -2,7 +2,7 @@ import { supabase } from './supabase';
 import { Player } from './types/interfaces';
 
 // TODO: organize methods properly
-export async function getByePlayer() {
+export async function getByePlayer(): Promise<Player> {
   const { data, error } = await supabase
     .from('players')
     .select('*')
@@ -42,21 +42,13 @@ export async function getEnrolledPlayers(eventId: string): Promise<Player[]> {
   return players as Player[];
 }
 
-export async function isPlayerBusyOnDate(username: string, dateStr: str): Promise<boolean> {
-  console.log(`Checking if player ${username} is busy on date ${dateStr}`);
-
+export async function isPlayerBusyOnDate(username: string, dateStr: string): Promise<boolean> {
   const { data, error } = await supabase
     .from('game_sessions')
     .select('id')
     .eq('match_date', dateStr)
     .or(`player1_username.eq.${username}, player2_username.eq.${username}`)
     .limit(1);
-  // .neq('event_id', eventId); TODO: this shouldnt be needed since it doesnt matter as long as the player is busy
-
-
-  console.log("Data:", data);
-  console.log("--------------")
-
 
   if (error) throw new Error(`Error checking busy date: ${error.message}`);
   return data.length > 0;
@@ -69,7 +61,7 @@ export async function insertGameSession(params: {
   player1: string;
   player2: string;
   winner?: string | null;
-}) {
+}): Promise<void> {
   const { eventId, round, matchDate, player1, player2, winner } = params;
 
   const { error } = await supabase
