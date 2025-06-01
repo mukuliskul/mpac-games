@@ -1,6 +1,17 @@
 import { supabase } from './supabase';
 import { Player } from './types/interfaces';
-import { formatInTimeZone } from "date-fns-tz";
+
+// TODO: organize methods properly
+export async function getByePlayer() {
+  const { data, error } = await supabase
+    .from('players')
+    .select('*')
+    .eq('username', 'BYE')
+    .single();
+
+  if (error) throw new Error("Missing BYE player in DB");
+  return data;
+}
 
 export async function getEnrolledPlayers(eventId: string): Promise<Player[]> {
   // Step 1: Get usernames from enrollments

@@ -5,6 +5,7 @@ import { Match, Player } from "./types/interfaces";
 import { DaysOfWeek, Role, TeamName } from "./types/enums";
 import { formatInTimeZone } from "date-fns-tz";
 import { DateTime } from "luxon";
+import { getByePlayer } from "./db";
 
 
 export async function generateBracket(eventId: string, enrollmentEndDate: string) {
@@ -17,20 +18,9 @@ export async function generateBracket(eventId: string, enrollmentEndDate: string
   // Step 2: Add byes if needed to reach power of 2
   const targetCount = Math.pow(2, Math.ceil(Math.log2(shuffled.length)));
 
-  // TODO: instead of making BYE, make sure to always fetch it from the db
+  const byePlayer: Player = await getByePlayer();
   while (shuffled.length < targetCount) {
-    shuffled.push({
-      username: `BYE`,
-      team: TeamName.Other,
-      days_in_office: [
-        DaysOfWeek.Monday,
-        DaysOfWeek.Tuesday,
-        DaysOfWeek.Wednesday,
-        DaysOfWeek.Thursday,
-        DaysOfWeek.Friday,
-      ],
-      role: Role.Player,
-    });
+    shuffled.push(byePlayer);
   }
 
   console.log("Shuffled players:", shuffled.map(p => p.username));
