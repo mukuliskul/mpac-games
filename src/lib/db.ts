@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Player } from './types/interfaces';
+import { Match, Player } from './types/interfaces';
 
 // TODO: organize methods properly
 export async function getByePlayer(): Promise<Player> {
@@ -52,6 +52,52 @@ export async function isPlayerBusyOnDate(username: string, dateStr: string): Pro
 
   if (error) throw new Error(`Error checking busy date: ${error.message}`);
   return data.length > 0;
+}
+
+export async function getLastRound(eventId: string): Promise<number> {
+  const { data, error } = await supabase
+    .from('game_sessions')
+    .select('round')
+    .eq('event_id', eventId)
+    .order('round', { ascending: false })
+    .limit(1);
+
+  if (error || !data.length) throw new Error("No previous rounds");
+
+  return data[0].round;
+}
+
+export async function getPlayersByUsernames(usernames: string[]) {
+  const { data, error } = await supabase
+    .from('players')
+    .select('*')
+    .in('username', usernames);
+
+  if (error) throw new Error("Failed to fetch players");
+  return data;
+}
+
+export async function getMatchesForRound(eventId: string, round: number): Promise<Match[]> {
+  const { data, error } = await supabase
+    .from('game_sessions')
+    .select('*')
+    .eq('event_id', eventId)
+    .eq('round', round);
+
+  if (error) throw new Error("Failed to fetch matches");
+
+  return data.map(row => {
+
+    const match: Match = {
+      player1: row.player1_username,
+      player2: row.player2_username,
+      round: row.round,
+      date: row.match_date,
+      winner: row.winner_username,
+    };
+
+    return match;
+  });
 }
 
 export async function insertGameSession(params: {

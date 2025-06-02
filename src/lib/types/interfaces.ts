@@ -55,6 +55,7 @@ export interface Match {
   player2: Player;
   round: number;
   date: string;
+  winner: string | null;
 }
 
 export interface Leaderboard {
