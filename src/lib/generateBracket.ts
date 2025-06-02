@@ -5,7 +5,6 @@ import { DaysOfWeek } from "./types/enums";
 import { DateTime } from "luxon";
 import { getByePlayer } from "./db";
 import { formatToNYDateString, parseNYDateString } from "./date";
-import { match } from "assert";
 
 
 export async function generateFirstRound(
