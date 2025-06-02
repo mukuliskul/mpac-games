@@ -68,19 +68,17 @@ export async function generateNextRound(
 ): Promise<{ message: string }> {
   const lastRound = await getLastRound(eventId);
   const lastRoundMatches = await getMatchesForRound(eventId, lastRound);
-  console.log("Last round matches:", lastRoundMatches);
 
   const invalidMatch = lastRoundMatches.find((match: Match) => match.winner === null);
   if (invalidMatch) {
-    console.log("Invalid match found:", invalidMatch);
     throw new Error(`Match with player1=${invalidMatch.player1} and player2=${invalidMatch.player2} has no winner`);
   }
-  // WORKING TILL HERE
 
   const winners: string[] = lastRoundMatches.map((match: Match) => match.winner!);
   // TODO: ensure that winners only battle based on the bracket's integrity
 
   if (winners.length === 1) {
+    console.log("Tournament is complete. Winner:", winners[0]);
     return { message: "Tournament is complete. Winner: " + winners[0] };
   }
 
