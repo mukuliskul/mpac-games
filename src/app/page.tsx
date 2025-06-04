@@ -27,7 +27,8 @@ export default function Default() {
           throw new Error("Failed to fetch players");
         }
         const data = await response.json();
-        setPlayers(data);
+        const filteredData = data.filter((player: Player) => player.username !== "BYE");
+        setPlayers(filteredData);
       } catch (err: unknown) {
         if (err instanceof Error) {
           setError("Failed to fetch players.");
