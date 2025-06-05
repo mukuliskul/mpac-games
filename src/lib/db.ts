@@ -100,6 +100,29 @@ export async function getMatchesForRound(eventId: string, round: number): Promis
   });
 }
 
+export async function getAllRounds(eventId: string): Promise<Match[][]> {
+  const rounds: Match[][] = [];
+  let round = 1;
+
+  while (true) {
+    // TODO: order by dates in asc
+    const matches = await getMatchesForRound(eventId, round);
+    if (!matches || matches.length === 0) break;
+    rounds.push(matches);
+    round++;
+  }
+
+
+  for (let i = 0; i < rounds.length; i++) {
+    console.log(`Round ${i + 1} matches:`);
+    rounds[i].forEach(match => {
+      console.log(`  Player 1: ${match.player1}, Player 2: ${match.player2}, Winner: ${match.winner ?? 'TBD'}`);
+    });
+  }
+
+  return rounds;
+}
+
 export async function insertGameSession(params: {
   eventId: string;
   round: number;

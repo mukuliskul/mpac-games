@@ -51,8 +51,8 @@ export interface Player {
 };
 
 export interface Match {
-  player1: Player;
-  player2: Player;
+  player1: string;
+  player2: string;
   round: number;
   date: string;
   winner: string | null;
