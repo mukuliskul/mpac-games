@@ -4,6 +4,9 @@ import { Match } from "@/lib/types/interfaces";
 import { Card, CardContent } from "@/components/ui/card";
 
 // TODO: Replace this with actual jotai instance
+// TODO: add color highlighting for winner and loser?
+// TODO: space the cards out more horizontally
+// TODO: add lines if possible but not necessary
 const loggedInUsername = "Mukul";
 
 interface BracketViewProps {
