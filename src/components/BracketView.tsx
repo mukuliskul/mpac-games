@@ -1,7 +1,6 @@
 'use client';
 
 import { Match } from "@/lib/types/interfaces";
-import { Card, CardContent } from "@/components/ui/card";
 import { useAtomValue } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
 

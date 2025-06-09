@@ -100,6 +100,8 @@ export async function getMatchesForRound(eventId: string, round: number): Promis
   });
 }
 
+// TODO: move this logic to use effect
+// TODO: move the logic for get matches for round to a nextjs endpoint
 export async function getAllRounds(eventId: string): Promise<Match[][]> {
   const rounds: Match[][] = [];
   let round = 1;
@@ -110,14 +112,6 @@ export async function getAllRounds(eventId: string): Promise<Match[][]> {
     if (!matches || matches.length === 0) break;
     rounds.push(matches);
     round++;
-  }
-
-
-  for (let i = 0; i < rounds.length; i++) {
-    console.log(`Round ${i + 1} matches:`);
-    rounds[i].forEach(match => {
-      console.log(`  Player 1: ${match.player1}, Player 2: ${match.player2}, Winner: ${match.winner ?? 'TBD'}`);
-    });
   }
 
   return rounds;

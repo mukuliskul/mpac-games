@@ -1,7 +1,7 @@
 import { DaysOfWeek, EventStatus, GameMode, Role, TeamName } from "./enums";
 
 export interface Game {
-  id: number;
+  id: string;
   name: string;
   description: string;
   image_url: string;
@@ -11,7 +11,7 @@ export interface Game {
 }
 
 export interface Edition {
-  id: number;
+  id: string;
   name: string;
   is_active: boolean;
   enrollment_end_date: string;
@@ -19,7 +19,7 @@ export interface Edition {
 }
 
 export interface Event {
-  id: number;
+  id: string;
   game_name: string;
   enrolled_count: number;
   edition: string;
@@ -28,13 +28,13 @@ export interface Event {
 }
 
 export interface Enrollment {
-  id: number;
+  id: string;
   event_id: number;
   username: string;
 }
 
 export interface GameSession {
-  id: number;
+  id: string;
   game_name: string;
   start_time: string;
   end_time: string;
