@@ -2,12 +2,12 @@
 
 import { Match } from "@/lib/types/interfaces";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAtomValue } from "jotai";
+import { usernameAtom } from "@/state/usernameAtom";
 
-// TODO: Replace this with actual jotai instance
 // TODO: add color highlighting for winner and loser?
 // TODO: space the cards out more horizontally
 // TODO: add lines if possible but not necessary
-const loggedInUsername = "Mukul";
 
 interface BracketViewProps {
   rounds: Match[][];
@@ -20,6 +20,7 @@ const getTotalRounds = (playerCount: number) => {
 };
 
 export function BracketView({ rounds }: BracketViewProps) {
+  const selectedUsername = useAtomValue(usernameAtom);
   const initialPlayerCount = rounds[0]?.length * 2 || 0;
   const totalRounds = getTotalRounds(initialPlayerCount);
 
@@ -56,7 +57,7 @@ export function BracketView({ rounds }: BracketViewProps) {
                             <strong>Player 1:</strong>{" "}
                             <span
                               className={
-                                match.player1 === loggedInUsername
+                                match.player1 === selectedUsername
                                   ? "text-blue-600 font-semibold"
                                   : ""
                               }
@@ -68,7 +69,7 @@ export function BracketView({ rounds }: BracketViewProps) {
                             <strong>Player 2:</strong>{" "}
                             <span
                               className={
-                                match.player2 === loggedInUsername
+                                match.player2 === selectedUsername
                                   ? "text-blue-600 font-semibold"
                                   : ""
                               }
