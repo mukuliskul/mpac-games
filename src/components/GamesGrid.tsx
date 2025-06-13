@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
+import { Game } from "@/lib/types/interfaces";
 
 const gradients = [
   "bg-gradient-to-r from-purple-500 to-pink-500",
@@ -17,7 +18,7 @@ const gradients = [
 const GamesGrid = ({
   games
 }: {
-  games: { id: number; name: string; description: string; image_url: string }[]
+  games: Game[]
 }) => {
   if (games.length === 0) {
     return (
