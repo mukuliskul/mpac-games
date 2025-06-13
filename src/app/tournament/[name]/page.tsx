@@ -47,6 +47,7 @@ export default function TournamentPage({
   }, [name, currentEdition]);
 
 
+  // TODO: next round trigger should happen automatically when all matches are completed
   useEffect(() => {
     async function fetchRounds() {
       if (!event) return;
