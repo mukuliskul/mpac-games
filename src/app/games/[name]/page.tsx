@@ -11,7 +11,7 @@ import LeaderboardTable from "@/components/LeaderboardTable";
 import type { Game, Leaderboard, Player, Event } from "@/lib/types/interfaces";
 import { useAtomValue } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
-import { currentEditionAtom, enrollmentEndDateAtom } from "@/state/editionAtom";
+import { currentEditionAtom, editionStartDateAtom, enrollmentEndDateAtom } from "@/state/editionAtom";
 import { checkEnrollmentOpen } from "@/lib/utils";
 
 export default function GamePage({
@@ -33,6 +33,7 @@ export default function GamePage({
   const selectedUsername = useAtomValue(usernameAtom);
   const currentEdition = useAtomValue(currentEditionAtom)!
   const endEnrollmentDate = useAtomValue(enrollmentEndDateAtom)!
+  const startEditionDate = useAtomValue(editionStartDateAtom)!;
 
   // Fetch game details by name
   useEffect(() => {
@@ -239,6 +240,30 @@ export default function GamePage({
     setSubmitError(null);
   };
 
+  const handleGenerateTournament = async () => {
+    if (!event) {
+      console.error("Event not found for tournament generation");
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/tournament/${event.id}/setup/${startEditionDate}`, {
+        method: 'POST',
+      });
+
+      if (!res.ok) {
+        throw new Error(`Error: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      console.log('Tournament generated:', data);
+
+      // Optionally trigger revalidation or state update
+    } catch (error) {
+      console.error('Failed to generate tournament:', error);
+    }
+  };
+
   // Handle winner submission
   const handleSubmit = async () => {
     if (!winner.trim()) {
@@ -313,9 +338,14 @@ export default function GamePage({
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-3xl font-bold">Leaderboard</h2>
           {selectedUsername?.toLowerCase() === "mukul" || selectedUsername?.toLowerCase() === "nina" ? (
-            <Button className="bg-blue-600 text-white px-4 py-2" onClick={openModal}>
-              Add Winner
-            </Button>
+            <div className="flex gap-2">
+              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2" onClick={handleGenerateTournament}>
+                Generate Tournament
+              </Button>
+              <Button className="bg-blue-600 text-white px-4 py-2" onClick={openModal}>
+                Add Winner
+              </Button>
+            </div>
           ) : null}
         </div>
 

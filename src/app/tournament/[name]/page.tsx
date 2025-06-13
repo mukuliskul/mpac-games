@@ -16,6 +16,7 @@ export default function TournamentPage({
   const [error, setError] = useState<string | null>(null);
   const [rounds, setRounds] = useState<Match[][]>([]);
 
+  // TODO: test if tournament brackets are rendered correctly when there are players only for round 1, round 1 and 2 etc etc
 
   useEffect(() => {
     async function fetchEvent() {
@@ -62,7 +63,6 @@ export default function TournamentPage({
         }
 
         const matchesData: Match[] = await response.json();
-        console.log(matchesData);
 
         if (!matchesData || matchesData.length === 0) {
           break; // No more rounds to fetch
@@ -72,7 +72,6 @@ export default function TournamentPage({
         round++;
       }
 
-      console.log(fetchedRounds);
       setRounds(fetchedRounds);
     }
 
