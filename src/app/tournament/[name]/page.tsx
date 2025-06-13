@@ -1,6 +1,5 @@
 "use client";
 
-import { getAllRounds, getMatchesForRound } from "@/lib/db";
 import { BracketView } from "@/components/BracketView";
 import { useAtomValue } from "jotai";
 import { currentEditionAtom } from "@/state/editionAtom";
@@ -49,21 +48,34 @@ export default function TournamentPage({
 
   useEffect(() => {
     async function fetchRounds() {
-      // Ensure event is loaded before fetching rounds
       if (!event) return;
 
       const fetchedRounds: Match[][] = [];
       let round = 1;
+
       while (true) {
-        // TODO: order by dates in asc
-        // TODO: move the logic for get matches for round to a nextjs endpoint
-        const matches = await getMatchesForRound(event.id, round);
-        if (!matches || matches.length === 0) break;
-        fetchedRounds.push(matches);
+        const response = await fetch(`/api/game-session/${event.id}/${round}`);
+
+        if (!response.ok) {
+          console.error(`Error fetching round ${round}:`, response.status);
+          break;
+        }
+
+        const matchesData: Match[] = await response.json();
+        console.log(matchesData);
+
+        if (!matchesData || matchesData.length === 0) {
+          break; // No more rounds to fetch
+        }
+
+        fetchedRounds.push(matchesData);
         round++;
       }
+
+      console.log(fetchedRounds);
       setRounds(fetchedRounds);
     }
+
     fetchRounds();
   }, [event]);
 
@@ -73,8 +85,20 @@ export default function TournamentPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-center mt-6">Tournament Bracket</h1>
-      <BracketView rounds={rounds} />
+      {rounds.length === 0 || rounds[0]?.length === 0 ? (
+        <div className="flex flex-col items-center justify-center text-center mt-20 text-gray-500">
+          <div className="text-4xl mb-4">🕒</div>
+          <p className="text-lg font-medium">No matches have been scheduled yet.</p>
+          <p className="text-sm text-gray-400 mt-1">
+            Once the tournament begins, brackets and match details will appear here.
+          </p>
+        </div>
+      ) : (
+        <>
+          <h1 className="text-2xl font-bold text-center mt-6">Tournament Bracket</h1>
+          <BracketView rounds={rounds} />
+        </>
+      )}
     </div>
   );
 }

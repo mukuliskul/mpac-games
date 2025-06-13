@@ -100,23 +100,6 @@ export async function getMatchesForRound(eventId: string, round: number): Promis
   });
 }
 
-// TODO: move this logic to use effect
-// TODO: move the logic for get matches for round to a nextjs endpoint
-export async function getAllRounds(eventId: string): Promise<Match[][]> {
-  const rounds: Match[][] = [];
-  let round = 1;
-
-  while (true) {
-    // TODO: order by dates in asc
-    const matches = await getMatchesForRound(eventId, round);
-    if (!matches || matches.length === 0) break;
-    rounds.push(matches);
-    round++;
-  }
-
-  return rounds;
-}
-
 export async function insertGameSession(params: {
   eventId: string;
   round: number;
