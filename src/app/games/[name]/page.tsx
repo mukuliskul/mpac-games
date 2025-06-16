@@ -264,6 +264,22 @@ export default function GamePage({
     }
   };
 
+  const isTournamentGenerated = async () => {
+    if (!event) return false;
+    // TODO: get event status fro, /event/id/status endpoint
+
+    // try {
+    //   const response = await fetch(`/api/tournament/${event.id}/status`);
+    //   if (!response.ok) throw new Error("Failed to check tournament status");
+    //
+    //   const data = await response.json();
+    //   return data.isGenerated; // Assuming the API returns an object with isGenerated property
+    // } catch (err) {
+    //   console.error("Failed to check tournament status", err);
+    //   return false;
+    // }
+  }
+
   // Handle winner submission
   const handleSubmit = async () => {
     if (!winner.trim()) {
@@ -339,7 +355,11 @@ export default function GamePage({
           <h2 className="text-3xl font-bold">Leaderboard</h2>
           {selectedUsername?.toLowerCase() === "mukul" || selectedUsername?.toLowerCase() === "nina" ? (
             <div className="flex gap-2">
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2" onClick={handleGenerateTournament}>
+              <Button
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2"
+                onClick={handleGenerateTournament}
+                disabled={isTournamentGenerated}
+              >
                 Generate Tournament
               </Button>
               <Button className="bg-blue-600 text-white px-4 py-2" onClick={openModal}>
