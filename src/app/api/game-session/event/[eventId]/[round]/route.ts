@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase";
 import { Match } from "@/lib/types/interfaces";
 
 /**
- * GET /api/game-sessions/[eventId]/[round]
+ * GET /api/game-sessions/event/[eventId]/[round]
  *
  * eventId: string
  * round: number
@@ -34,6 +34,7 @@ export async function GET(
 
   const matches = (data ?? []).map(row => {
     const match: Match = {
+      id: row.id,
       player1: row.player1_username,
       player2: row.player2_username,
       round: row.round,

@@ -34,7 +34,7 @@ export async function GET(
 
 
 /**
- * POST /api/event/[eventId]/status/
+ * PUT /api/event/[eventId]/status/
  *
  * eventId: string
  * body: { status: EventStatus } // EventStatus = "open" | "started" | "closed"
@@ -42,7 +42,7 @@ export async function GET(
  * Updates the status of an event 
 */
 
-export async function POST(
+export async function PUT(
   request: Request,
   { params }: {
     params: Promise<{

@@ -52,6 +52,7 @@ export interface Player {
 };
 
 export interface Match {
+  id: string;
   player1: string;
   player2: string;
   round: number;

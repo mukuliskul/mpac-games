@@ -261,7 +261,7 @@ export default function GamePage({
       console.log('Tournament generated:', data);
 
       const res2 = await fetch(`/api/event/${event.id}/status`, {
-        method: 'POST',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: EventStatus.Started }),
       });

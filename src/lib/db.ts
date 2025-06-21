@@ -44,6 +44,23 @@ export async function updateEventStatus(
   }
 }
 
+export async function updateWinner(
+  gameSessionId: string,
+  winner: string
+): Promise<void> {
+  const { error } = await supabase
+    .from('game_sessions')
+    .update({ winner_username: winner })
+    .eq('id', gameSessionId);
+
+  if (error) {
+    throw new Error(`Failed to update winner: ${error.message}`);
+  }
+}
+
+
+
+
 export async function getEnrolledPlayers(eventId: string): Promise<Player[]> {
   // Step 1: Get usernames from enrollments
   const { data: enrollments, error: enrollmentsError } = await supabase

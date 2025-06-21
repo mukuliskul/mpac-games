@@ -57,7 +57,7 @@ export default function TournamentPage({
       let round = 1;
 
       while (true) {
-        const response = await fetch(`/api/game-session/${event.id}/${round}`);
+        const response = await fetch(`/api/game-session/event/${event.id}/${round}`);
 
         if (!response.ok) {
           console.error(`Error fetching round ${round}:`, response.status);

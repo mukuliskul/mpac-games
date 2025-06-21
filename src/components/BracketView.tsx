@@ -3,8 +3,7 @@
 import { Match } from "@/lib/types/interfaces";
 import { useAtomValue } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
-
-// TODO: add lines if possible but not necessary
+import { CheckCircle } from "lucide-react";
 
 interface BracketViewProps {
   rounds: Match[][];
@@ -46,7 +45,8 @@ export function BracketView({ rounds }: BracketViewProps) {
                   const renderPlayerCard = (
                     player: string | null | undefined,
                     matchWinner: string | null | undefined,
-                    isInMatch: boolean
+                    isInMatch: boolean,
+                    matchId: string,
                   ) => {
                     const isUser = player === selectedUsername;
                     const isPlaceholder = !player;
@@ -71,13 +71,50 @@ export function BracketView({ rounds }: BracketViewProps) {
 
                     const borderClass = isUser ? "border border-blue-500" : "border border-transparent";
 
+                    const handleSetWinner = async () => {
+                      if (!player || hasWinner) return;
+
+                      try {
+                        const response = await fetch(`/api/game-session/${matchId}`, {
+                          method: "PUT",
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                          body: JSON.stringify({
+                            winner: player,
+                          }),
+                        });
+
+                        if (!response.ok) {
+                          console.error("Failed to set winner");
+                        }
+                      } catch (error) {
+                        console.error("Error setting winner", error);
+                      }
+                    };
+
                     return (
-                      <div
-                        className={`w-full p-4 shadow-md rounded-xl text-sm ${bgClass} ${textClass} ${borderClass} ${opacityClass}`}
-                      >
+                      <div className={`w-full p-4 shadow-md rounded-xl text-sm relative flex items-center justify-between ${bgClass} ${textClass} ${borderClass} ${opacityClass}`}>
                         <div>
-                          <strong>{isInMatch && player === match?.player1 ? "Player 1" : isInMatch && player === match?.player2 ? "Player 2" : "Player"}:</strong> {player || "TBD"}
+                          <strong>
+                            {isInMatch && player === match?.player1
+                              ? "Player 1"
+                              : isInMatch && player === match?.player2
+                                ? "Player 2"
+                                : "Player"}
+                            :
+                          </strong>{" "}
+                          {player || "TBD"}
                         </div>
+                        {!hasWinner && player && isInMatch && (
+                          <button
+                            onClick={handleSetWinner}
+                            className="ml-2 text-gray-400 hover:text-green-600 transition"
+                            title="Mark as winner"
+                          >
+                            <CheckCircle className="w-5 h-5" />
+                          </button>
+                        )}
                       </div>
                     );
                   };
@@ -87,16 +124,16 @@ export function BracketView({ rounds }: BracketViewProps) {
                       {match
                         ? <>
                           <div className="flex flex-col gap-2 w-full">
-                            {renderPlayerCard(match.player1, match.winner, true)}
-                            {renderPlayerCard(match.player2, match.winner, true)}
+                            {renderPlayerCard(match.player1, match.winner, true, match.id)}
+                            {renderPlayerCard(match.player2, match.winner, true, match.id)}
                             <div className="text-[11px] text-gray-400 text-center mt-1">
                               {match.date}
                             </div>
                           </div>
                         </>
                         : <>
-                          {renderPlayerCard(null, null, false)}
-                          {renderPlayerCard(null, null, false)}
+                          {renderPlayerCard(null, null, false, "")}
+                          {renderPlayerCard(null, null, false, "")}
                           <div className="text-xs text-gray-400 mt-1 opacity-50">TBD</div>
                         </>
                       }
