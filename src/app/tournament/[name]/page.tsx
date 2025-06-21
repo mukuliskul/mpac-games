@@ -96,7 +96,9 @@ export default function TournamentPage({
     player: string | null | undefined,
     matchWinner: string | null | undefined,
     isInMatch: boolean,
-    matchId: string
+    matchId: string,
+    roundIndex: number,
+    idx: number
   ) => {
     const isUser = player === selectedUsername;
     const isPlaceholder = !player;
@@ -122,7 +124,7 @@ export default function TournamentPage({
     const borderClass = isUser ? "border border-blue-500" : "border border-transparent";
 
     const handleSetWinner = async () => {
-      if (!player || hasWinner) return;
+      if (!event || !matchId || !player) return;
 
       try {
         const response = await fetch(`/api/game-session/${matchId}`, {
@@ -133,11 +135,42 @@ export default function TournamentPage({
           body: JSON.stringify({ winner: player }),
         });
 
-        if (response.ok) {
-          fetchRounds();
-        } else {
+        if (!response.ok) {
           console.error("Failed to set winner");
+          return;
         }
+
+        // Update the local rounds state
+        const currentRoundMatches = [...rounds[roundIndex]];
+        currentRoundMatches[idx] = {
+          ...currentRoundMatches[idx],
+          winner: player,
+        };
+
+        const isEven = idx % 2 === 0;
+        const pairIdx = isEven ? idx + 1 : idx - 1;
+        const currentMatch = currentRoundMatches[idx];
+        currentMatch.winner = player; // Set current match winner
+        const pairedMatch = currentRoundMatches[pairIdx];
+
+        if (currentMatch?.winner && pairedMatch?.winner) {
+          await fetch("/api/game-session/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              round: roundIndex + 2, // Round is 0-indexed, so +2 for next round
+              player_1: isEven ? currentMatch.winner : pairedMatch.winner,
+              player_2: isEven ? pairedMatch.winner : currentMatch.winner,
+              match_date: "2025-05-05", // TODO: update to use dynamic date logic
+              event_id: event.id,
+            }),
+          });
+        }
+
+        // Refresh brackets to reflect the updated state
+        await fetchRounds();
       } catch (error) {
         console.error("Error setting winner", error);
       }
@@ -215,16 +248,16 @@ export default function TournamentPage({
                           >
                             {match ? (
                               <div className="flex flex-col gap-2 w-full">
-                                {renderPlayerCard(match.player1, match.winner, true, match.id)}
-                                {renderPlayerCard(match.player2, match.winner, true, match.id)}
+                                {renderPlayerCard(match.player1, match.winner, true, match.id, roundIndex, idx)}
+                                {renderPlayerCard(match.player2, match.winner, true, match.id, roundIndex, idx)}
                                 <div className="text-[11px] text-gray-400 text-center mt-1">
                                   {match.date}
                                 </div>
                               </div>
                             ) : (
                               <>
-                                {renderPlayerCard(null, null, false, "")}
-                                {renderPlayerCard(null, null, false, "")}
+                                {renderPlayerCard(null, null, false, "", roundIndex, idx)}
+                                {renderPlayerCard(null, null, false, "", roundIndex, idx)}
                                 <div className="text-xs text-gray-400 mt-1 opacity-50">TBD</div>
                               </>
                             )}

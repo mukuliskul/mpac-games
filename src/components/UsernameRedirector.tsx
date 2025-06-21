@@ -15,7 +15,6 @@ const UsernameRedirector = () => {
     }
 
     const storedUsername = localStorage.getItem("username");
-    console.log("Stored username in localStorage:", storedUsername);
 
     if (!storedUsername) {
       router.push("/");

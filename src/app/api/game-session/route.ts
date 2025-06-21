@@ -14,14 +14,21 @@
 
 import { insertGameSession } from "@/lib/db";
 
-export async function PUT(
+export async function POST(
   request: Request,
 ) {
   try {
     const body = await request.json();
     const { player_1, player_2, event_id, round, match_date } = body;
 
-    console.log(`Creating game session for players ${player_1} vs ${player_2} in event ${event_id}`);
+    console.log(`
+      Creating game session:
+      Player 1: ${player_1},
+      Player 2: ${player_2},
+      Event ID: ${event_id},
+      Round: ${round},
+      Match Date: ${match_date}
+    `)
     const result = await insertGameSession({
       eventId: event_id,
       round: round,
