@@ -137,6 +137,7 @@ export async function getMatchesForRound(eventId: string, round: number): Promis
   return data.map(row => {
 
     const match: Match = {
+      id: row.id,
       player1: row.player1_username,
       player2: row.player2_username,
       round: row.round,
