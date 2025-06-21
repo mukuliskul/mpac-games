@@ -25,6 +25,7 @@ export async function GET(
     .select('*')
     .eq('event_id', eventId)
     .eq('round', round)
+    .order('match_date', { ascending: true })
     .order('created_at', { ascending: true });
 
   if (error) {

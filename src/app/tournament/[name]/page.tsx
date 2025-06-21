@@ -15,7 +15,7 @@ export default function TournamentPage({
   const currentEdition = useAtomValue(currentEditionAtom)!
   const [event, setEvent] = useState<Event | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [rounds, setRounds] = useState<Match[][] | undefined>(undefined);
+  const [rounds, setRounds] = useState<Match[][]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   // TODO: test if tournament brackets are rendered correctly when there are players only for round 1, round 1 and 2 etc etc

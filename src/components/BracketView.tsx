@@ -54,6 +54,7 @@ export function BracketView({ rounds }: BracketViewProps) {
 
                     let bgClass = "bg-white";
                     let textClass = "";
+                    let opacityClass = "";
 
                     if (isPlaceholder) {
                       bgClass = "bg-gray-50";
@@ -64,13 +65,14 @@ export function BracketView({ rounds }: BracketViewProps) {
                     } else if (hasWinner && isInMatch) {
                       bgClass = "bg-red-50";
                       textClass = "text-red-600";
+                      opacityClass = "opacity-50";
                     }
 
                     const borderClass = isUser ? "border border-blue-500" : "border border-transparent";
 
                     return (
                       <div
-                        className={`w-full p-4 shadow-md rounded-xl text-sm ${bgClass} ${textClass} ${borderClass}`}
+                        className={`w-full p-4 shadow-md rounded-xl text-sm ${bgClass} ${textClass} ${borderClass} ${opacityClass}`}
                       >
                         <div>
                           <strong>{isInMatch && player === match?.player1 ? "Player 1" : isInMatch && player === match?.player2 ? "Player 2" : "Player"}:</strong> {player || "TBD"}
@@ -80,7 +82,7 @@ export function BracketView({ rounds }: BracketViewProps) {
                   };
 
                   return (
-                    <div key={match ? `match-${idx}` : `placeholder-${idx}`} className="flex flex-col items-center gap-2">
+                    <div key={match ? `match - ${idx} ` : `placeholder - ${idx} `} className="flex flex-col items-center gap-2">
                       {match
                         ? <>
                           <div className="flex flex-col gap-2 w-full">
