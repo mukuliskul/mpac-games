@@ -269,32 +269,32 @@ export default function GamePage({
       if (!res2.ok) {
         throw new Error(`Error: ${res2.statusText}`);
       }
-
+      checkIfTournamentOpen();
     } catch (error) {
       console.error('Failed during handling with error:', error);
     }
   };
 
-  useEffect(() => {
-    const checkTournamentStatus = async () => {
-      if (!event) {
-        return;
-      }
+  const checkIfTournamentOpen = useCallback(async () => {
+    if (!event) {
+      return;
+    }
 
-      try {
-        const response = await fetch(`/api/event/${event.id}/status`);
-        if (!response.ok) throw new Error("Failed to check tournament status");
+    try {
+      const response = await fetch(`/api/event/${event.id}/status`);
+      if (!response.ok) throw new Error("Failed to check tournament status");
 
-        const data = await response.json();
-        setIsTournamentOpen(data.status === EventStatus.Open); // disable if not open
-      } catch (err) {
-        console.error("Failed to check tournament status", err);
-        setIsTournamentOpen(false);
-      }
-    };
-
-    checkTournamentStatus();
+      const data = await response.json();
+      setIsTournamentOpen(data.status === EventStatus.Open); // disable if not open
+    } catch (err) {
+      console.error("Failed to check tournament status", err);
+      setIsTournamentOpen(false);
+    }
   }, [event]);
+
+  useEffect(() => {
+    checkIfTournamentOpen();
+  }, [checkIfTournamentOpen]);
 
   // Handle winner submission
   const handleSubmit = async () => {
