@@ -24,7 +24,8 @@ export async function GET(
     .from('game_sessions')
     .select('*')
     .eq('event_id', eventId)
-    .eq('round', round);
+    .eq('round', round)
+    .order('created_at', { ascending: true });
 
   if (error) {
     return new Response("Error fetching data", { status: 500 });

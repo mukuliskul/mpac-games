@@ -19,8 +19,6 @@ export default function TournamentPage({
   const [loading, setLoading] = useState<boolean>(true);
 
   // TODO: test if tournament brackets are rendered correctly when there are players only for round 1, round 1 and 2 etc etc
-
-
   useEffect(() => {
     async function fetchEvent() {
       try {
