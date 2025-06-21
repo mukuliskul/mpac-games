@@ -1,4 +1,4 @@
-import { isHoliday } from "./utils";
+import { getPublicHolidays } from "./utils";
 import { getEnrolledPlayers, isPlayerBusyOnDate, insertGameSession } from "./db";
 import { Player } from "./types/interfaces";
 import { DaysOfWeek } from "./types/enums";
@@ -30,7 +30,6 @@ export async function generateFirstRound(
 
   const editionStartDateObjConst = parseNYDateString(editionStartDate);
   let editionStartDateObj = editionStartDateObjConst;
-  const publicHolidays = await isHoliday();
 
   for (let i = 0; i < shuffled.length; i += 2) {
     const player1 = shuffled[i];
@@ -40,7 +39,7 @@ export async function generateFirstRound(
 
     const matchDate = isBye(player1) || isBye(player2)
       ? editionStartDateObjConst // If one player is BYE, use the original start date
-      : await findNextAvailableDate(player1, player2, editionStartDateObj, publicHolidays);
+      : await findNextAvailableDate(player1, player2, editionStartDateObj);
 
     const winner = isBye(player1)
       ? player2.username
@@ -86,7 +85,7 @@ export async function generateFirstRound(
 //
 //   const playerRecords = await getPlayersByUsernames(winners);
 //
-//   const publicHolidays = await isHoliday();
+//   const publicHolidays = await getPublicHolidays();
 //
 //   const nextRound = lastRound + 1;
 //   let roundStartDateObj = parseNYDateString(roundStartDate);
@@ -121,19 +120,19 @@ export async function findNextAvailableDate(
   p1: Player,
   p2: Player,
   startDate: DateTime,
-  holidays: Set<string>,
 ): Promise<DateTime> {
   let date = startDate;
+  const holidays = await getPublicHolidays();
 
   while (true) {
     const dateStr = formatToNYDateString(date);
     const day = date.toFormat("EEEE") as DaysOfWeek;
-    const isHoliday = holidays.has(dateStr);
+    const getPublicHolidays = holidays.has(dateStr);
 
     const bothAvailable = p1.days_in_office.includes(day) && p2.days_in_office.includes(day);
     const bothFree = !(await isPlayerBusyOnDate(p1.username, dateStr)) &&
       !(await isPlayerBusyOnDate(p2.username, dateStr));
-    if (bothAvailable && bothFree && !isHoliday) {
+    if (bothAvailable && bothFree && !getPublicHolidays) {
       console.log("---------------------");
       console.log("Found available date:", dateStr);
       console.log("---------------------");

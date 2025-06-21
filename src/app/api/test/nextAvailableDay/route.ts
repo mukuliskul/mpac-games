@@ -23,7 +23,6 @@ export async function GET() {
       player1,
       player2,
       localDate,
-      new Set(['2025-05-13', '2025-07-12', '2025-09-22']),
     );
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

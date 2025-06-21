@@ -21,7 +21,7 @@ export function checkEnrollmentOpen(enrollmentEndDate: string | null): boolean {
   return currentDate.toMillis() < endDate.toMillis();
 }
 
-export async function isHoliday(): Promise<Set<string>> {
+export async function getPublicHolidays(): Promise<Set<string>> {
   const res = await fetch(`https://canada-holidays.ca/api/v1/holidays`);
 
   if (!res.ok) {
