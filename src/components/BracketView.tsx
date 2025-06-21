@@ -85,6 +85,8 @@ export function BracketView({ rounds }: BracketViewProps) {
                           }),
                         });
 
+                        console.log()
+
                         if (!response.ok) {
                           console.error("Failed to set winner");
                         }
@@ -106,15 +108,18 @@ export function BracketView({ rounds }: BracketViewProps) {
                           </strong>{" "}
                           {player || "TBD"}
                         </div>
-                        {!hasWinner && player && isInMatch && (
-                          <button
-                            onClick={handleSetWinner}
-                            className="ml-2 text-gray-400 hover:text-green-600 transition"
-                            title="Mark as winner"
-                          >
-                            <CheckCircle className="w-5 h-5" />
-                          </button>
-                        )}
+                        {!hasWinner &&
+                          player &&
+                          isInMatch &&
+                          (selectedUsername?.toLowerCase() === "nina" || selectedUsername?.toLowerCase() === "mukul") && (
+                            <button
+                              onClick={handleSetWinner}
+                              className="ml-2 text-gray-400 hover:text-green-600 transition"
+                              title="Mark as winner"
+                            >
+                              <CheckCircle className="w-5 h-5" />
+                            </button>
+                          )}
                       </div>
                     );
                   };
