@@ -5,6 +5,7 @@ import { useAtomValue } from "jotai";
 import { currentEditionAtom } from "@/state/editionAtom";
 import { use, useEffect, useState } from "react";
 import type { Event, Match } from "@/lib/types/interfaces";
+import { Spinner } from "@/components/ui/spinner";
 
 
 export default function TournamentPage({
@@ -14,9 +15,11 @@ export default function TournamentPage({
   const currentEdition = useAtomValue(currentEditionAtom)!
   const [event, setEvent] = useState<Event | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [rounds, setRounds] = useState<Match[][]>([]);
+  const [rounds, setRounds] = useState<Match[][] | undefined>(undefined);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // TODO: test if tournament brackets are rendered correctly when there are players only for round 1, round 1 and 2 etc etc
+
 
   useEffect(() => {
     async function fetchEvent() {
@@ -74,10 +77,20 @@ export default function TournamentPage({
       }
 
       setRounds(fetchedRounds);
+      setLoading(false);
     }
 
     fetchRounds();
   }, [event]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Spinner />
+      </div>
+    );
+  }
+
 
 
   if (error) {

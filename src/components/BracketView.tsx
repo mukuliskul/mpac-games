@@ -73,7 +73,7 @@ export function BracketView({ rounds }: BracketViewProps) {
                         className={`w-full p-4 shadow-md rounded-xl text-sm ${bgClass} ${textClass} ${borderClass}`}
                       >
                         <div>
-                          <strong>Player:</strong> {player || "TBD"}
+                          <strong>{isInMatch && player === match?.player1 ? "Player 1" : isInMatch && player === match?.player2 ? "Player 2" : "Player"}:</strong> {player || "TBD"}
                         </div>
                       </div>
                     );
