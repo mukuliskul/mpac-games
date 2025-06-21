@@ -13,6 +13,7 @@ import { useAtomValue } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
 import { currentEditionAtom, editionStartDateAtom, enrollmentEndDateAtom } from "@/state/editionAtom";
 import { checkEnrollmentOpen } from "@/lib/utils";
+import { EventStatus } from "@/lib/types/enums";
 
 export default function GamePage({
   params,
@@ -27,6 +28,7 @@ export default function GamePage({
   const [enrolledPlayersCount, setEnrolledPlayersCount] = useState(0);
   const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTournamentOpen, setIsTournamentOpen] = useState<boolean>(false);
   const [winner, setWinner] = useState("");
   const [players, setPlayers] = useState<Player[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -258,27 +260,41 @@ export default function GamePage({
       const data = await res.json();
       console.log('Tournament generated:', data);
 
-      // Optionally trigger revalidation or state update
+      const res2 = await fetch(`/api/event/${event.id}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: EventStatus.Started }),
+      });
+
+      if (!res2.ok) {
+        throw new Error(`Error: ${res2.statusText}`);
+      }
+
     } catch (error) {
-      console.error('Failed to generate tournament:', error);
+      console.error('Failed during handling with error:', error);
     }
   };
 
-  const isTournamentGenerated = async () => {
-    if (!event) return false;
-    // TODO: get event status fro, /event/id/status endpoint
+  useEffect(() => {
+    const checkTournamentStatus = async () => {
+      if (!event) {
+        return;
+      }
 
-    // try {
-    //   const response = await fetch(`/api/tournament/${event.id}/status`);
-    //   if (!response.ok) throw new Error("Failed to check tournament status");
-    //
-    //   const data = await response.json();
-    //   return data.isGenerated; // Assuming the API returns an object with isGenerated property
-    // } catch (err) {
-    //   console.error("Failed to check tournament status", err);
-    //   return false;
-    // }
-  }
+      try {
+        const response = await fetch(`/api/event/${event.id}/status`);
+        if (!response.ok) throw new Error("Failed to check tournament status");
+
+        const data = await response.json();
+        setIsTournamentOpen(data.status === EventStatus.Open); // disable if not open
+      } catch (err) {
+        console.error("Failed to check tournament status", err);
+        setIsTournamentOpen(false);
+      }
+    };
+
+    checkTournamentStatus();
+  }, [event]);
 
   // Handle winner submission
   const handleSubmit = async () => {
@@ -339,16 +355,9 @@ export default function GamePage({
       <Card className="mb-6 p-4 shadow-md">
         <h2 className="text-2xl font-semibold mb-4">Description</h2>
         <p className="text-lg">{game.description}</p>
-        <p className="text-lg mt-4">{game.modes}</p>
-
-        {game.modes && (
-          <>
-            <h2 className="text-2xl font-semibold mt-6 mb-4">Game Modes</h2>
-            <p className="text-lg">{game.modes.join(', ')}</p>
-          </>
-        )}
       </Card>
 
+      {/* TODO: add instructions to game page */}
       {/* Leaderboard Section */}
       <div className="mt-6">
         <div className="flex justify-between items-center mb-4">
@@ -358,7 +367,7 @@ export default function GamePage({
               <Button
                 className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2"
                 onClick={handleGenerateTournament}
-                disabled={isTournamentGenerated}
+                disabled={!isTournamentOpen}
               >
                 Generate Tournament
               </Button>

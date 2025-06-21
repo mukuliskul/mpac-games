@@ -1,7 +1,7 @@
 import { isHoliday } from "./utils";
 import { getEnrolledPlayers, isPlayerBusyOnDate, insertGameSession, getLastRound, getMatchesForRound, getPlayersByUsernames } from "./db";
 import { Match, Player } from "./types/interfaces";
-import { DaysOfWeek } from "./types/enums";
+import { DaysOfWeek, EventStatus } from "./types/enums";
 import { DateTime } from "luxon";
 import { getByePlayer } from "./db";
 import { formatToNYDateString, parseNYDateString } from "./date";
@@ -61,6 +61,20 @@ export async function generateFirstRound(
   }
 
   return { message: "First round generated" };
+}
+
+export async function updateEditionStatus(
+  editionId: number,
+  status: EventStatus
+): Promise<void> {
+  const { error } = await supabase
+    .from('editions')
+    .update({ status })
+    .eq('id', editionId);
+
+  if (error) {
+    throw new Error(`Failed to update status: ${error.message}`);
+  }
 }
 
 export async function generateNextRound(

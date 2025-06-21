@@ -8,6 +8,7 @@ export interface Game {
   rules: string;
   modes: GameMode[];
   available_online: boolean;
+  is_active: boolean;
 }
 
 export interface Edition {

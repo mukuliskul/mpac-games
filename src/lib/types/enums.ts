@@ -1,5 +1,6 @@
 export enum EventStatus {
   Open = "open",
+  Started = "started",
   Closed = "closed",
 }
 

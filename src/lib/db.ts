@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { EventStatus } from './types/enums';
 import { Match, Player } from './types/interfaces';
 
 // TODO: organize methods properly
@@ -11,6 +12,36 @@ export async function getByePlayer(): Promise<Player> {
 
   if (error) throw new Error("Missing BYE player in DB");
   return data;
+}
+
+export async function getEventStatus(eventId: string): Promise<EventStatus> {
+  const { data, error } = await supabase
+    .from('event')
+    .select('event_status')
+    .eq('id', eventId)
+    .single();
+
+  if (error) throw new Error(`Error fetching event status: ${error.message}`);
+  if (!data) throw new Error("Event not found");
+
+  return data.event_status as EventStatus;
+}
+
+export async function updateEventStatus(
+  eventId: string,
+  status: EventStatus
+): Promise<void> {
+  console.log(`Updating event ${eventId} status to ${status} 1`);
+  const { error } = await supabase
+    .from('event')
+    .update({ event_status: status })
+    .eq('id', eventId);
+
+  console.log(`Updating event ${eventId} status to ${status}`);
+
+  if (error) {
+    throw new Error(`Failed to update status: ${error.message}`);
+  }
 }
 
 export async function getEnrolledPlayers(eventId: string): Promise<Player[]> {
