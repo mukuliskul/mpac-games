@@ -59,6 +59,7 @@ export function BracketView({ rounds }: BracketViewProps) {
                     if (isPlaceholder) {
                       bgClass = "bg-gray-50";
                       textClass = "text-gray-400";
+                      opacityClass = "opacity-50";
                     } else if (hasWinner && player === matchWinner) {
                       bgClass = "bg-green-50";
                       textClass = "text-green-600 font-semibold";
@@ -96,7 +97,7 @@ export function BracketView({ rounds }: BracketViewProps) {
                         : <>
                           {renderPlayerCard(null, null, false)}
                           {renderPlayerCard(null, null, false)}
-                          <div className="text-xs text-gray-400 mt-1">TBD</div>
+                          <div className="text-xs text-gray-400 mt-1 opacity-50">TBD</div>
                         </>
                       }
                     </div>

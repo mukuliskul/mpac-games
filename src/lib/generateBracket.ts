@@ -63,71 +63,58 @@ export async function generateFirstRound(
   return { message: "First round generated" };
 }
 
-export async function updateEditionStatus(
-  editionId: number,
-  status: EventStatus
-): Promise<void> {
-  const { error } = await supabase
-    .from('editions')
-    .update({ status })
-    .eq('id', editionId);
-
-  if (error) {
-    throw new Error(`Failed to update status: ${error.message}`);
-  }
-}
-
-export async function generateNextRound(
-  eventId: string,
-  roundStartDate: string,
-): Promise<{ message: string }> {
-  const lastRound = await getLastRound(eventId);
-  const lastRoundMatches = await getMatchesForRound(eventId, lastRound);
-
-  const invalidMatch = lastRoundMatches.find((match: Match) => match.winner === null);
-  if (invalidMatch) {
-    throw new Error(`Match with player1=${invalidMatch.player1} and player2=${invalidMatch.player2} has no winner`);
-  }
-
-  const winners: string[] = lastRoundMatches.map((match: Match) => match.winner!);
-  // TODO: ensure that winners only battle based on the bracket's integrity
-
-  if (winners.length === 1) {
-    console.log("Tournament is complete. Winner:", winners[0]);
-    return { message: "Tournament is complete. Winner: " + winners[0] };
-  }
-
-  const playerRecords = await getPlayersByUsernames(winners);
-
-  const publicHolidays = await isHoliday();
-
-  const nextRound = lastRound + 1;
-  let roundStartDateObj = parseNYDateString(roundStartDate);
-
-  for (let i = 0; i < playerRecords.length; i += 2) {
-    const player1 = playerRecords[i];
-    const player2 = playerRecords[i + 1];
-
-    const matchDate = await findNextAvailableDate(
-      player1,
-      player2,
-      roundStartDateObj,
-      publicHolidays
-    );
-
-    await insertGameSession({
-      eventId,
-      round: nextRound,
-      matchDate: formatToNYDateString(matchDate),
-      player1: player1.username,
-      player2: player2.username,
-    });
-
-    roundStartDateObj = matchDate.plus({ days: 1 });
-  }
-
-  return { message: `Round ${nextRound} generated` };
-}
+// TODO: remove this method?
+// export async function generateNextRound(
+//   eventId: string,
+//   roundStartDate: string,
+// ): Promise<{ message: string }> {
+//   const lastRound = await getLastRound(eventId);
+//   const lastRoundMatches = await getMatchesForRound(eventId, lastRound);
+//
+//   const invalidMatch = lastRoundMatches.find((match: Match) => match.winner === null);
+//   if (invalidMatch) {
+//     throw new Error(`Match with player1=${invalidMatch.player1} and player2=${invalidMatch.player2} has no winner`);
+//   }
+//
+//   const winners: string[] = lastRoundMatches.map((match: Match) => match.winner!);
+//   // TODO: ensure that winners only battle based on the bracket's integrity
+//
+//   if (winners.length === 1) {
+//     console.log("Tournament is complete. Winner:", winners[0]);
+//     return { message: "Tournament is complete. Winner: " + winners[0] };
+//   }
+//
+//   const playerRecords = await getPlayersByUsernames(winners);
+//
+//   const publicHolidays = await isHoliday();
+//
+//   const nextRound = lastRound + 1;
+//   let roundStartDateObj = parseNYDateString(roundStartDate);
+//
+//   for (let i = 0; i < playerRecords.length; i += 2) {
+//     const player1 = playerRecords[i];
+//     const player2 = playerRecords[i + 1];
+//
+//     const matchDate = await findNextAvailableDate(
+//       player1,
+//       player2,
+//       roundStartDateObj,
+//       publicHolidays
+//     );
+//
+//     await insertGameSession({
+//       eventId,
+//       round: nextRound,
+//       matchDate: formatToNYDateString(matchDate),
+//       player1: player1.username,
+//       player2: player2.username,
+//     });
+//
+//     roundStartDateObj = matchDate.plus({ days: 1 });
+//   }
+//
+//   return { message: `Round ${nextRound} generated` };
+// }
 // TODO: dont export method below, only being done for internal testing
 // Tries to find the next mutual day for match
 export async function findNextAvailableDate(
