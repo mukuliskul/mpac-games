@@ -39,19 +39,13 @@ export async function generateFirstRound(
       ? editionStartDateObjConst // If one player is BYE, use the original start date
       : await findNextAvailableDate(player1, player2, editionStartDateObj);
 
-    const winner = isBye(player1)
-      ? player2.username
-      : isBye(player2)
-        ? player1.username
-        : null;
-
     await insertGameSession({
       eventId: eventId,
       round: 1,
       matchDate: formatToNYDateString(matchDate),
       player1: player1.username,
       player2: player2.username,
-      winner: winner,
+      winner: null,
     });
 
     editionStartDateObj = editionStartDateObj.plus({ days: 1 });
