@@ -13,6 +13,7 @@ import { currentEditionAtom, editionStartDateAtom, enrollmentEndDateAtom } from 
 import { checkEnrollmentOpen } from "@/lib/utils";
 import { EventStatus } from "@/lib/types/enums";
 import Link from "next/link";
+import { Countdown } from "@/components/Countdown";
 
 export default function GamePage({
   params,
@@ -339,7 +340,12 @@ export default function GamePage({
               : "Enroll"}
         </Button>
 
-        {/* Player Count */}
+        {/* Countdown (below the button) */}
+        {isEnrollmentOpen && (
+          <Countdown targetDate={endEnrollmentDate} />
+        )}
+
+        {/* Enrolled players count */}
         <div className="flex items-center">
           <Users className="w-4 h-4 mr-1" />
           <span className="tracking-tight">
