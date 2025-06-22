@@ -14,6 +14,7 @@ import { checkEnrollmentOpen } from "@/lib/utils";
 import { EventStatus } from "@/lib/types/enums";
 import Link from "next/link";
 import { Countdown } from "@/components/Countdown";
+import { motion } from "framer-motion";
 
 export default function GamePage({
   params,
@@ -32,6 +33,7 @@ export default function GamePage({
   const currentEdition = useAtomValue(currentEditionAtom)!
   const endEnrollmentDate = useAtomValue(enrollmentEndDateAtom)!
   const startEditionDate = useAtomValue(editionStartDateAtom)!;
+  const [showAIModal, setShowAIModal] = useState(false);
 
   // Fetch game details by name
   useEffect(() => {
@@ -326,33 +328,69 @@ export default function GamePage({
         </Card>
       </div>
 
-      {/* Enroll Button */}
+      {/* Enroll Button and AI Button next to each other */}
       <div className="flex flex-col items-center mt-6 space-y-2 text-sm text-muted-foreground">
-        <Button
-          onClick={handleEnrollClick}
-          disabled={isAlreadyEnrolled || !isEnrollmentOpen}
-          className="w-full max-w-xs text-base font-medium"
-        >
-          {isAlreadyEnrolled
-            ? "Already Enrolled"
-            : !isEnrollmentOpen
-              ? "Enrollment Closed"
-              : "Enroll"}
-        </Button>
+        <div className="flex gap-3 w-full max-w-xs">
+          <Button
+            onClick={handleEnrollClick}
+            disabled={isAlreadyEnrolled || !isEnrollmentOpen}
+            className="flex-grow text-base font-medium"
+          >
+            {isAlreadyEnrolled
+              ? "Already Enrolled"
+              : !isEnrollmentOpen
+                ? "Enrollment Closed"
+                : "Enroll"}
+          </Button>
 
-        {/* Countdown (below the button) */}
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            whileTap={{ scale: 0.95, rotate: -3 }}
+            transition={{ duration: 0.2 }}
+            className="flex-shrink-0"
+          >
+            <Button
+              onClick={() => setShowAIModal(true)}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-4 py-2 whitespace-nowrap"
+            >
+              🤖 Use AI to win
+            </Button>
+          </motion.div>
+        </div>
+
+        {/* Countdown (below the buttons) */}
         {isEnrollmentOpen && (
           <Countdown targetDate={endEnrollmentDate} />
         )}
 
         {/* Enrolled players count */}
-        <div className="flex items-center">
+        <div className="flex items-center mt-2">
           <Users className="w-4 h-4 mr-1" />
           <span className="tracking-tight">
             {enrolledPlayersCount} {enrolledPlayersCount === 1 ? "player" : "players"} enrolled
           </span>
         </div>
-      </div>
-    </div>
+
+        {/* AI Modal */}
+        {showAIModal && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl text-center space-y-4"
+            >
+              <h2 className="text-xl font-bold text-gray-800">🧠 Chill...</h2>
+              <p className="text-gray-600 text-sm">
+                Not every website needs AI, bro. 🙄
+              </p>
+              <Button onClick={() => setShowAIModal(false)} className="w-full">
+                Fine, I’ll play fair
+              </Button>
+            </motion.div>
+          </div>
+        )}
+      </div>    </div>
   );
 }
