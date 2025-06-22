@@ -21,3 +21,10 @@ export function parseNYDateString(dateStr: string): DateTime {
 export function getCurrentNYDateTime(): DateTime {
   return DateTime.now().setZone("America/New_York");
 }
+
+/**
+ * Returns the current date (YYYY-MM-DD) in America/New_York timezone.
+ */
+export function getCurrentNYDateString(): string {
+  return DateTime.now().setZone("America/New_York").toISODate()!;
+}

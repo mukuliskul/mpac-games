@@ -1,3 +1,5 @@
+import { updateWinner } from "@/lib/db";
+
 /**
  * PUT /api/game-session/[gameSessionId]/
  *
@@ -6,9 +8,6 @@
  *
  * Updates the winner of a game session
 */
-
-import { updateWinner } from "@/lib/db";
-
 export async function PUT(
   request: Request,
   { params }: {

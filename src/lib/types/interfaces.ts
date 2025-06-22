@@ -34,16 +34,6 @@ export interface Enrollment {
   username: string;
 }
 
-export interface GameSession {
-  id: string;
-  game_name: string;
-  start_time: string;
-  end_time: string;
-  status: string;
-  date: string;
-  enrolled_count: number
-}
-
 export interface Player {
   username: string;
   team: TeamName;

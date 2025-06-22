@@ -2,28 +2,28 @@
 
 import { useEffect, useState } from "react";
 import GamesGrid from "@/components/GamesGrid";
-import { Game, Leaderboard } from "@/lib/types/interfaces";
+import UpcomingMatchesTable from "@/components/UpcomingMatchesTable";
+import { Game, Match } from "@/lib/types/interfaces";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
-import LeaderboardTable from "@/components/LeaderboardTable";
 
 const Homepage = () => {
   const [games, setGames] = useState<Game[]>([]);
-  const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
+  const [matches, setMatches] = useState<Match[]>([]);
   const [loadingGames, setLoadingGames] = useState(true);
-  const [loadingLeaderboard, setLoadingLeaderboard] = useState(true);
+  const [loadingMatches, setLoadingMatches] = useState(true);
   const [errorGames, setErrorGames] = useState<string | null>(null);
-  const [errorLeaderboard, setErrorLeaderboard] = useState<string | null>(null);
+  const [errorMatches, setErrorMatches] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
 
   useEffect(() => {
-    if (loadingGames || loadingLeaderboard) {
+    if (loadingGames || loadingMatches) {
       const interval = setInterval(() => {
         setProgress((prev) => (prev < 90 ? prev + 10 : prev));
       }, 300);
       return () => clearInterval(interval);
     }
-  }, [loadingGames, loadingLeaderboard]);
+  }, [loadingGames, loadingMatches]);
 
   useEffect(() => {
     async function fetchGames() {
@@ -45,25 +45,25 @@ const Homepage = () => {
   }, []);
 
   useEffect(() => {
-    async function fetchLeaderboard() {
+    async function fetchMatches() {
       try {
-        const response = await fetch("/api/leaderboard");
+        const response = await fetch("/api/game-session?upcoming=true");
         if (!response.ok) {
-          throw new Error("Failed to fetch leaderboard");
+          throw new Error("Failed to fetch matches");
         }
         const data = await response.json();
-        setLeaderboard(data);
+        setMatches(data.sessions);
       } catch (err) {
         console.error(err);
-        setErrorLeaderboard("Failed to fetch leaderboard.");
+        setErrorMatches("Failed to fetch matches.");
       } finally {
-        setLoadingLeaderboard(false);
+        setLoadingMatches(false);
       }
     }
-    fetchLeaderboard();
+    fetchMatches();
   }, []);
 
-  if (loadingGames || loadingLeaderboard) {
+  if (loadingGames || loadingMatches) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <p className="text-gray-500 text-lg mb-4">Loading data...</p>
@@ -72,17 +72,17 @@ const Homepage = () => {
     );
   }
 
-  if (errorGames || errorLeaderboard) {
-    return <div className="text-center text-red-500">{errorGames || errorLeaderboard}</div>;
+  if (errorGames || errorMatches) {
+    return <div className="text-center text-red-500">{errorGames || errorMatches}</div>;
   }
 
   return (
     <div className="container mx-auto px-6 py-10">
-      {/* Leaderboard Section */}
-      <h1 className="text-4xl font-semibold text-center text-gray-800 mb-8">Leaderboard</h1>
+      {/* Matches Section */}
+      <h1 className="text-4xl font-semibold text-center text-gray-800 mb-8">Upcoming Matches</h1>
       <Card className="mb-10">
         <CardContent className="p-4">
-          <LeaderboardTable leaderboard={leaderboard} />
+          <UpcomingMatchesTable matches={matches} />
         </CardContent>
       </Card>
 
