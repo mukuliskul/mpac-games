@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full overflow-hidden">
+    <html lang="en" className="h-full overflow-y-auto">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
       >
