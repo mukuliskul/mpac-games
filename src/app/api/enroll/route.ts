@@ -1,8 +1,7 @@
 import { supabase } from "@/lib/supabase";
 
-// TODO: add type hints to my all methods
-
-//TODO: use NextResponse instead of Response
+// TODO: add docstring to all methods
+// TODO: use NextResponse instead of Response
 
 // POST: Enroll user in event
 export async function POST(request: Request) {

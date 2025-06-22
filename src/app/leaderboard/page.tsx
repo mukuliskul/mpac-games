@@ -6,7 +6,6 @@ import type { Leaderboard } from "@/lib/types/interfaces";
 import { Spinner } from '@/components/ui/spinner';
 import LeaderboardTable from "@/components/LeaderboardTable";
 
-// TODO: make sure leaderboards are updated when a winner is added to a game session
 export default function AggregateLeaderboard() {
   const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
   const [loading, setLoading] = useState(true);
