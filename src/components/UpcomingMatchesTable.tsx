@@ -39,18 +39,26 @@ const UpcomingMatchesTable = ({
       </TableHeader>
       <TableBody>
         {upcomingMatches.map(({ id, player1, player2, round, date }) => {
-          const isCurrentUserInMatch =
-            selectedUsername === player1 || selectedUsername === player2;
+          const isUserInMatch = selectedUsername === player1 || selectedUsername === player2;
+          const matchLabel = (
+            <>
+              <span className={player1 === selectedUsername ? "font-semibold text-yellow-700" : ""}>
+                {player1}
+              </span>{" "}
+              <span className="text-gray-400">vs</span>{" "}
+              <span className={player2 === selectedUsername ? "font-semibold text-yellow-700" : ""}>
+                {player2}
+              </span>
+            </>
+          );
 
           return (
             <TableRow
               key={id}
-              className={isCurrentUserInMatch ? "bg-yellow-100" : ""}
+              className={isUserInMatch ? "bg-yellow-50 hover:bg-yellow-100 transition" : ""}
             >
-              <TableCell>{date}</TableCell>
-              <TableCell>
-                {player1} <span className="text-gray-400">vs</span> {player2}
-              </TableCell>
+              <TableCell className="font-medium">{date}</TableCell>
+              <TableCell>{matchLabel}</TableCell>
               <TableCell className="text-center">{round}</TableCell>
             </TableRow>
           );
