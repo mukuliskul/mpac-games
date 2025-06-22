@@ -231,18 +231,24 @@ export default function TournamentPage({
                       {Array.from({ length: totalMatchesInRound }).map((_, idx) => {
                         const match = matches[idx];
 
+                        // For vertical alignment: spacing increases by round depth
+                        const spacerMultiplier = Math.pow(2, roundIndex) - 1;
+                        const spacerHeight = (cardHeightPx + cardGapPx) * (spacerMultiplier / 2);
+
                         return (
                           <div
                             key={match ? `match-${idx}` : `placeholder-${idx}`}
                             className="flex flex-col items-center gap-2"
+                            style={{
+                              marginTop: roundIndex === 0 ? 0 : spacerHeight,
+                              marginBottom: roundIndex === 0 ? cardGapPx : spacerHeight,
+                            }}
                           >
                             {match ? (
                               <div className="flex flex-col gap-2 w-full">
                                 {renderPlayerCard(match.player1, match.winner, true, match.id, roundIndex, idx)}
                                 {renderPlayerCard(match.player2, match.winner, true, match.id, roundIndex, idx)}
-                                <div className="text-[11px] text-gray-400 text-center mt-1">
-                                  {match.date}
-                                </div>
+                                <div className="text-[11px] text-gray-400 text-center mt-1">{match.date}</div>
                               </div>
                             ) : (
                               <>
