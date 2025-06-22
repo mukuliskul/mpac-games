@@ -14,6 +14,7 @@ export async function generateFirstRound(
   const players = await getEnrolledPlayers(eventId);
   if (players.length < 2) throw new Error("Not enough players");
 
+  // TODO: perform shuffle after adding BYE
   const shuffled = [...players].sort(() => Math.random() - 0.5);
   const targetCount = Math.pow(2, Math.ceil(Math.log2(shuffled.length)));
 
