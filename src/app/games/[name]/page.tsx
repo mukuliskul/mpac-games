@@ -5,10 +5,8 @@ import { use, useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import LeaderboardTable from "@/components/LeaderboardTable";
-import type { Game, Leaderboard, Player, Event } from "@/lib/types/interfaces";
+import type { Game, Leaderboard, Event } from "@/lib/types/interfaces";
 import { useAtomValue } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
 import { currentEditionAtom, editionStartDateAtom, enrollmentEndDateAtom } from "@/state/editionAtom";
@@ -27,11 +25,7 @@ export default function GamePage({
   const [isAlreadyEnrolled, setIsAlreadyEnrolled] = useState(false);
   const [enrolledPlayersCount, setEnrolledPlayersCount] = useState(0);
   const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTournamentOpen, setIsTournamentOpen] = useState<boolean>(false);
-  const [winner, setWinner] = useState("");
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [submitError, setSubmitError] = useState<string | null>(null);
   const selectedUsername = useAtomValue(usernameAtom);
   const currentEdition = useAtomValue(currentEditionAtom)!
   const endEnrollmentDate = useAtomValue(enrollmentEndDateAtom)!
@@ -145,27 +139,10 @@ export default function GamePage({
     checkTotalEnrollmentCount();
   }, [checkTotalEnrollmentCount]);
 
-  // Fetch players list
-  useEffect(() => {
-    async function fetchPlayers() {
-      try {
-        const response = await fetch("/api/players");
-        if (!response.ok) throw new Error("Failed to fetch players");
-
-        const data = await response.json();
-        setPlayers(data);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch players.');
-      }
-    }
-
-    fetchPlayers();
-  }, []);
 
   async function enrollPlayer() {
     if (!event) {
-      setSubmitError("Event not found");
+      setError("Event not found");
       return;
     }
     try {
@@ -180,12 +157,12 @@ export default function GamePage({
 
       if (!response.ok) {
         const errorData = await response.json();
-        setSubmitError(errorData?.message || "Failed to enroll");
+        setError(errorData?.message || "Failed to enroll");
         return;
       }
     } catch (err: unknown) {
       console.error(err);
-      setSubmitError("An unexpected error occurred. Please try again.");
+      setError("An unexpected error occurred. Please try again.");
     }
   }
 
@@ -231,16 +208,6 @@ export default function GamePage({
     }
   };
 
-  // Modal open/close handlers
-  const openModal = () => {
-    setIsModalOpen(true);
-    setSubmitError(null);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSubmitError(null);
-  };
 
   const handleGenerateTournament = async () => {
     if (!event) {
@@ -296,39 +263,6 @@ export default function GamePage({
     checkIfTournamentOpen();
   }, [checkIfTournamentOpen]);
 
-  // Handle winner submission
-  const handleSubmit = async () => {
-    if (!winner.trim()) {
-      setSubmitError("Please enter your name");
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/leaderboard`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          game: name,
-          username: winner
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        setSubmitError(errorData?.message || "Failed to enroll");
-        return;
-      }
-
-      setSubmitError(null);
-      setIsModalOpen(false);
-      setWinner("");
-      await fetchLeaderboard();
-    } catch (err: unknown) {
-      console.error(err);
-      setSubmitError("An unexpected error occurred. Please try again.");
-    }
-  };
-
   // Loading and Error Handling UI
   if (loading) {
     return (
@@ -371,9 +305,6 @@ export default function GamePage({
               >
                 Generate Tournament
               </Button>
-              <Button className="bg-blue-600 text-white px-4 py-2" onClick={openModal}>
-                Add Winner
-              </Button>
             </div>
           ) : null}
         </div>
@@ -407,40 +338,6 @@ export default function GamePage({
           </span>
         </div>
       </div>
-
-      {/* Modal for Selecting Winner */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="p-6 rounded-xl shadow-lg">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-semibold">Select Name of the Winner</DialogTitle>
-          </DialogHeader>
-
-          <div className="mt-4 w-full">
-            <Select value={winner} onValueChange={setWinner}>
-              <SelectTrigger className="p-2 border rounded-md w-full">
-                <SelectValue placeholder="Select winner" />
-              </SelectTrigger>
-              <SelectContent>
-                {players.map((player, index) => (
-                  <SelectItem key={index} value={player.username}>
-                    {player.username}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Submit Error Message */}
-          {submitError && (
-            <div className="mt-4 text-red-600 font-semibold text-sm">{submitError}</div>
-          )}
-
-          <DialogFooter className="flex justify-end space-x-2 mt-4">
-            <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
-            <Button onClick={handleSubmit} className="bg-blue-600 text-white">Submit</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
