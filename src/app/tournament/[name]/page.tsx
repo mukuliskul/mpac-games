@@ -22,6 +22,7 @@ export default function TournamentPage({
   const selectedUsername = useAtomValue(usernameAtom);
   const initialPlayerCount = rounds[0]?.length * 2 || 0;
 
+  //TODO: test with 5 enrolled players
   const handleSetWinner = async (
     matchId: string,
     player: string,
