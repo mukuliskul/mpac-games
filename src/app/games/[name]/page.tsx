@@ -12,6 +12,7 @@ import { usernameAtom } from "@/state/usernameAtom";
 import { currentEditionAtom, editionStartDateAtom, enrollmentEndDateAtom } from "@/state/editionAtom";
 import { checkEnrollmentOpen } from "@/lib/utils";
 import { EventStatus } from "@/lib/types/enums";
+import Link from "next/link";
 
 export default function GamePage({
   params,
@@ -296,8 +297,8 @@ export default function GamePage({
       <div className="mt-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-3xl font-bold">Leaderboard</h2>
-          {selectedUsername?.toLowerCase() === "mukul" || selectedUsername?.toLowerCase() === "nina" ? (
-            <div className="flex gap-2">
+          <div className="flex gap-2">
+            {(selectedUsername?.toLowerCase() === "mukul" || selectedUsername?.toLowerCase() === "nina") && (
               <Button
                 className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2"
                 onClick={handleGenerateTournament}
@@ -305,8 +306,16 @@ export default function GamePage({
               >
                 Generate Tournament
               </Button>
-            </div>
-          ) : null}
+            )}
+
+            <Link href={`/tournament/${game.name.toLowerCase().replace(/\s+/g, '-')}`} passHref>
+              <Button
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2"
+              >
+                View Tournament
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <Card className="shadow-md">
