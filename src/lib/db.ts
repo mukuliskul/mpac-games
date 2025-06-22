@@ -125,6 +125,19 @@ export async function getPlayersByUsernames(usernames: string[]) {
   return data;
 }
 
+export async function getPlayerByUsername(username: string): Promise<Player> {
+  const { data, error } = await supabase
+    .from('players')
+    .select('*')
+    .eq('username', username)
+    .single();
+
+  if (error) {
+    throw new Error(`Error fetching player: ${error.message}`);
+  }
+  return data as Player;
+}
+
 export async function getMatchesForRound(eventId: string, round: number): Promise<Match[]> {
   const { data, error } = await supabase
     .from('game_sessions')

@@ -154,17 +154,15 @@ export default function TournamentPage({
         const pairedMatch = currentRoundMatches[pairIdx];
 
         if (currentMatch?.winner && pairedMatch?.winner) {
-          await fetch("/api/game-session/", {
+          await fetch(`/api/tournament/${event.id}/next-round`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
               round: roundIndex + 2, // Round is 0-indexed, so +2 for next round
-              player_1: isEven ? currentMatch.winner : pairedMatch.winner,
-              player_2: isEven ? pairedMatch.winner : currentMatch.winner,
-              match_date: "2025-05-05", // TODO: update to use dynamic date logic
-              event_id: event.id,
+              player1: isEven ? currentMatch.winner : pairedMatch.winner,
+              player2: isEven ? pairedMatch.winner : currentMatch.winner,
             }),
           });
         }

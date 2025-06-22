@@ -14,3 +14,10 @@ export function formatToNYDateString(date: Date | DateTime): string {
 export function parseNYDateString(dateStr: string): DateTime {
   return DateTime.fromISO(dateStr, { zone: 'America/New_York' });
 }
+
+/**
+ * Returns the current DateTime in America/New_York timezone (EST/EDT).
+ */
+export function getCurrentNYDateTime(): DateTime {
+  return DateTime.now().setZone("America/New_York");
+}
