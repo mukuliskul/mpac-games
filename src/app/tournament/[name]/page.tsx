@@ -8,6 +8,7 @@ import type { Event, Match } from "@/lib/types/interfaces";
 import { Spinner } from "@/components/ui/spinner";
 import { CheckCircle } from "lucide-react";
 
+//TODO: give extra points for winning the entire tournament?
 export default function TournamentPage({
   params,
 }: Readonly<{ params: Promise<{ name: string }> }>) {
@@ -179,14 +180,6 @@ export default function TournamentPage({
         className={`w-full p-4 shadow-md rounded-xl text-sm relative flex items-center justify-between ${bgClass} ${textClass} ${borderClass} ${opacityClass}`}
       >
         <div>
-          <strong>
-            {isInMatch && player === matchWinner
-              ? "Winner"
-              : isInMatch && player
-                ? "Player"
-                : "Player"}
-            :
-          </strong>{" "}
           {player || "TBD"}
         </div>
         {!hasWinner &&
