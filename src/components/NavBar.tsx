@@ -1,20 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useAtomValue } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
+import Link from "next/link";
 
 const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const selectedUsername = useAtomValue(usernameAtom);
-  const router = useRouter();
   const pathname = usePathname();
-
-  const navigateTo = (path: string) => {
-    router.push(path);
-    setMenuOpen(false);
-  };
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -27,31 +22,33 @@ const NavBar = () => {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         {/* Left Side: Logo */}
         <div className="flex items-center space-x-4">
-          <h1
+          <Link
+            href="/home"
             className="text-2xl font-bold cursor-pointer hover:text-yellow-500 transition duration-300"
-            onClick={() => navigateTo("/home")}
           >
             MPACC Games
-          </h1>
+          </Link>
         </div>
 
         {/* Right Side: Menu Items + Username Display */}
         <div className="hidden md:flex items-center space-x-8">
           {/* Games Link */}
-          <button
-            onClick={() => navigateTo("/games")}
-            className={`text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive("/games") ? "text-yellow-500 border-b-2 border-yellow-500" : ""}`}
+          <Link
+            href="/games"
+            className={`text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive("/games") ? "text-yellow-500 border-b-2 border-yellow-500" : ""
+              }`}
           >
             Games
-          </button>
+          </Link>
 
           {/* Leaderboard Link */}
-          <button
-            onClick={() => navigateTo("/leaderboard")}
-            className={`text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive("/leaderboard") ? "text-yellow-500 border-b-2 border-yellow-500" : ""}`}
+          <Link
+            href="/leaderboard"
+            className={`text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive("/leaderboard") ? "text-yellow-500 border-b-2 border-yellow-500" : ""
+              }`}
           >
             Leaderboard
-          </button>
+          </Link>
 
           {/* Welcome Message (only show when a username is selected) */}
           {selectedUsername && (
@@ -72,18 +69,20 @@ const NavBar = () => {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden flex flex-col items-center space-y-4 mt-4 bg-gradient-to-r from-blue-800 to-indigo-900 p-4 rounded-lg border-t border-indigo-600 shadow-md transition-all ease-in-out duration-300">
-          <button
-            onClick={() => navigateTo("/games")}
-            className={`text-white text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive("/games") ? "text-yellow-500 border-b-2 border-yellow-500" : ""}`}
+          <Link
+            href="/games"
+            className={`text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive("/games") ? "text-yellow-500 border-b-2 border-yellow-500" : ""
+              }`}
           >
             Games
-          </button>
-          <button
-            onClick={() => navigateTo("/leaderboard")}
-            className={`text-white text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive("/leaderboard") ? "text-yellow-500 border-b-2 border-yellow-500" : ""}`}
+          </Link>
+          <Link
+            href="/leaderboard"
+            className={`text-lg font-medium uppercase hover:text-yellow-500 transition duration-300 ${isActive("/leaderboard") ? "text-yellow-500 border-b-2 border-yellow-500" : ""
+              }`}
           >
             Leaderboard
-          </button>
+          </Link>
 
           {/* Welcome Message in Mobile Menu */}
           {selectedUsername && (
