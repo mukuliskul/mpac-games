@@ -6,6 +6,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export function slugify(str: string): string {
+  return str
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+}
+
 /**
  * Check if enrollment is still open
  * @param enrollmentEndDate ISO string, e.g. "2025-04-30"
