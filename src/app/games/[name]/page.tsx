@@ -10,16 +10,18 @@ import type { Game, Leaderboard, Event } from "@/lib/types/interfaces";
 import { useAtomValue } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
 import { currentEditionAtom, editionStartDateAtom, enrollmentEndDateAtom } from "@/state/editionAtom";
-import { checkEnrollmentOpen } from "@/lib/utils";
+import { checkEnrollmentOpen, slugify } from "@/lib/utils";
 import { EventStatus } from "@/lib/types/enums";
 import Link from "next/link";
 import { Countdown } from "@/components/Countdown";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function GamePage({
   params,
 }: Readonly<{ params: Promise<{ name: string }> }>) {
   const { name } = use(params);
+  const router = useRouter();
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -219,6 +221,11 @@ export default function GamePage({
       return;
     }
 
+    if (!game) {
+      console.error("Game not found for tournament generation");
+      return;
+    }
+
     try {
       const res = await fetch(`/api/tournament/${event.id}/setup/${startEditionDate}`, {
         method: 'POST',
@@ -227,9 +234,6 @@ export default function GamePage({
       if (!res.ok) {
         throw new Error(`Error: ${res.statusText}`);
       }
-
-      const data = await res.json();
-      console.log('Tournament generated:', data);
 
       const res2 = await fetch(`/api/event/${event.id}/status`, {
         method: 'PUT',
@@ -242,6 +246,7 @@ export default function GamePage({
       }
 
       checkIfTournamentOpen();
+      router.push(`/tournament/${slugify(game?.name)}`);
     } catch (error) {
       console.error('Failed during handling with error:', error);
     }
