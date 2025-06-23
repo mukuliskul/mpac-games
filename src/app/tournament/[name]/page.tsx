@@ -11,6 +11,7 @@ import { PlayerCard } from "@/components/PlayerCard";
 export default function TournamentPage({
   params,
 }: Readonly<{ params: Promise<{ name: string }> }>) {
+  // TODO: it doesnt work when i go there using LINK but works if i refres the page if i am already there
   const { name } = use(params);
   const [event, setEvent] = useState<Event | null>(null);
   const [error, setError] = useState<string | null>(null);

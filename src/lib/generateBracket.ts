@@ -72,14 +72,6 @@ export async function findNextAvailableDate(
       !(await isPlayerBusyOnDate(p2.username, dateStr));
     const eventFree = !(await isEventBookedOnDate(eventId, dateStr));
 
-    //TODO: remove this
-    console.log("####################")
-    console.log("Checking date:", dateStr);
-    console.log("Both available:", bothAvailable);
-    console.log("Both free:", bothFree);
-    console.log("Event free:", eventFree);
-    console.log("####################")
-
     if (bothAvailable && bothFree && eventFree && !isHoliday) {
       console.log("---------------------");
       console.log("Found available date:", dateStr);
