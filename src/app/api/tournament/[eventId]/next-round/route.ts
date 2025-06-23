@@ -11,7 +11,7 @@
  * Creates a new game session for two players in a specific event, round, and date.
 */
 
-import { formatToNYDateString, getCurrentNYDateTime } from "@/lib/date";
+import { formatToNYDateString, getCurrentNYDateTime, } from "@/lib/date";
 import { getPlayerByUsername, insertGameSession } from "@/lib/db";
 import { findNextAvailableDate } from "@/lib/generateBracket";
 
@@ -35,7 +35,8 @@ export async function POST(
     const matchDateObj = await findNextAvailableDate(
       player1Obj,
       player2Obj,
-      startDate,
+      formatToNYDateString(startDate),
+      eventId
     )
     const matchDate = formatToNYDateString(matchDateObj);
 

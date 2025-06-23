@@ -231,15 +231,16 @@ export default function GamePage({
       const data = await res.json();
       console.log('Tournament generated:', data);
 
-      const res2 = await fetch(`/api/event/${event.id}/status`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: EventStatus.Started }),
-      });
-
-      if (!res2.ok) {
-        throw new Error(`Error: ${res2.statusText}`);
-      }
+      //TODO: undo this after testing
+      // const res2 = await fetch(`/api/event/${event.id}/status`, {
+      //   method: 'PUT',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ status: EventStatus.Started }),
+      // });
+      //
+      // if (!res2.ok) {
+      //   throw new Error(`Error: ${res2.statusText}`);
+      // }
       checkIfTournamentOpen();
     } catch (error) {
       console.error('Failed during handling with error:', error);

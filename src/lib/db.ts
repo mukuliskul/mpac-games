@@ -102,6 +102,18 @@ export async function isPlayerBusyOnDate(username: string, dateStr: string): Pro
   return data.length > 0;
 }
 
+export async function isEventBookedOnDate(eventId: string, dateStr: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('game_sessions')
+    .select('id')
+    .eq('event_id', eventId)
+    .eq('match_date', dateStr)
+    .limit(1);
+
+  if (error) throw new Error(`Error checking event booking: ${error.message}`);
+  return data.length > 0;
+}
+
 export async function getLastRound(eventId: string): Promise<number> {
   const { data, error } = await supabase
     .from('game_sessions')

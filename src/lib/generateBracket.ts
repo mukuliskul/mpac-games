@@ -1,5 +1,5 @@
 import { getPublicHolidays } from "./utils";
-import { getEnrolledPlayers, isPlayerBusyOnDate, insertGameSession } from "./db";
+import { getEnrolledPlayers, isPlayerBusyOnDate, insertGameSession, isEventBookedOnDate } from "./db";
 import { Player } from "./types/interfaces";
 import { DaysOfWeek } from "./types/enums";
 import { DateTime } from "luxon";
@@ -35,7 +35,7 @@ export async function generateFirstRound(
 
     const matchDate = isBye(player1) || isBye(player2)
       ? editionStartDateObjConst // If one player is BYE, use the original start date
-      : await findNextAvailableDate(player1, player2, editionStartDateObj);
+      : await findNextAvailableDate(player1, player2, editionStartDate, eventId);
 
     await insertGameSession({
       eventId: eventId,
@@ -56,26 +56,37 @@ export async function generateFirstRound(
 export async function findNextAvailableDate(
   p1: Player,
   p2: Player,
-  startDate: DateTime,
+  startDate: string,
+  eventId: string,
 ): Promise<DateTime> {
-  let date = startDate;
+  let dateObj = parseNYDateString(startDate);
   const holidays = await getPublicHolidays();
 
   while (true) {
-    const dateStr = formatToNYDateString(date);
-    const day = date.toFormat("EEEE") as DaysOfWeek;
-    const getPublicHolidays = holidays.has(dateStr);
+    const dateStr = formatToNYDateString(dateObj);
+    const day = dateObj.toFormat("EEEE") as DaysOfWeek;
+    const isHoliday = holidays.has(dateStr);
 
     const bothAvailable = p1.days_in_office.includes(day) && p2.days_in_office.includes(day);
     const bothFree = !(await isPlayerBusyOnDate(p1.username, dateStr)) &&
       !(await isPlayerBusyOnDate(p2.username, dateStr));
-    if (bothAvailable && bothFree && !getPublicHolidays) {
+    const eventFree = !(await isEventBookedOnDate(eventId, dateStr));
+
+    //TODO: remove this
+    console.log("####################")
+    console.log("Checking date:", dateStr);
+    console.log("Both available:", bothAvailable);
+    console.log("Both free:", bothFree);
+    console.log("Event free:", eventFree);
+    console.log("####################")
+
+    if (bothAvailable && bothFree && eventFree && !isHoliday) {
       console.log("---------------------");
       console.log("Found available date:", dateStr);
       console.log("---------------------");
-      return date;
+      return dateObj;
     }
 
-    date = date.plus({ days: 1 });
+    dateObj = dateObj.plus({ days: 1 });
   }
 }

@@ -32,7 +32,7 @@ export async function GET(
     return new Response("Error fetching data", { status: 500 });
   }
 
-  const matches = (data ?? []).map(row => ({
+  const matches: Match[] = (data ?? []).map(row => ({
     id: row.id,
     player1: row.player1_username,
     player2: row.player2_username,

@@ -75,7 +75,6 @@ export default function TournamentPage({
     fetchRounds();
   }, [fetchRounds]);
 
-  //TODO: test with 5 enrolled players
   const handleSetWinner = useCallback(async (
     matchId: string,
     player: string,
@@ -131,10 +130,13 @@ export default function TournamentPage({
       if (winner) return;
       if (processedMatches.current.has(matchId)) return;  // Skip if already processed
 
+
       const isBye1 = player1 === "BYE";
       const isBye2 = player2 === "BYE";
 
       if (!isBye1 && !isBye2) return;
+
+      // console.log(match)
 
       const autoWinner = isBye1 && !isBye2 ? player2! :
         isBye2 && !isBye1 ? player1! :
