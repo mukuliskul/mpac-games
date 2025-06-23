@@ -11,7 +11,6 @@ import { PlayerCard } from "@/components/PlayerCard";
 export default function TournamentPage({
   params,
 }: Readonly<{ params: Promise<{ name: string }> }>) {
-  // TODO: it doesnt work when i go there using LINK but works if i refres the page if i am already there
   const { name } = use(params);
   const [event, setEvent] = useState<Event | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -104,8 +103,11 @@ export default function TournamentPage({
       const currentMatch = currentRoundMatches[idx];
       currentMatch.winner = player;
       const pairedMatch = currentRoundMatches[pairIdx];
+      console.log("currentMatch:", currentMatch);
+      console.log("pairedMatch:", pairedMatch);
 
       if (currentMatch?.winner && pairedMatch?.winner) {
+        console.log(`Setting next round for match ${currentMatch.id} and ${pairedMatch.id}`);
         await fetch(`/api/tournament/${event.id}/next-round`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -137,8 +139,6 @@ export default function TournamentPage({
 
       if (!isBye1 && !isBye2) return;
 
-      // console.log(match)
-
       const autoWinner = isBye1 && !isBye2 ? player2! :
         isBye2 && !isBye1 ? player1! :
           "BYE";
@@ -156,9 +156,18 @@ export default function TournamentPage({
     const resolveAllByes = async () => {
       for (let roundIndex = 0; roundIndex < rounds.length; roundIndex++) {
         const matches = rounds[roundIndex];
-        for (let idx = 0; idx < matches.length; idx++) {
-          const match = matches[idx];
-          await autoResolveByeMatch(match, roundIndex, idx);
+
+        for (let idx = 0; idx < matches.length; idx += 2) {
+          const match1 = matches[idx];
+          const match2 = matches[idx + 1];
+
+          const promises = [];
+          if (match1) promises.push(autoResolveByeMatch(match1, roundIndex, idx));
+          if (match2) promises.push(autoResolveByeMatch(match2, roundIndex, idx + 1));
+          await Promise.all(promises);
+
+          // Wait a tick to ensure state sync
+          await new Promise((res) => setTimeout(res, 20));
         }
       }
     };
