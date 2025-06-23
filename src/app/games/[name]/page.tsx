@@ -16,6 +16,7 @@ import Link from "next/link";
 import { Countdown } from "@/components/Countdown";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { Progress } from "@/components/ui/progress";
 
 export default function GamePage({
   params,
@@ -24,6 +25,8 @@ export default function GamePage({
   const router = useRouter();
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [generatingTournamentLoader, setGeneratingTournamentLoader] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [event, setEvent] = useState<Event | null>(null);
   const [isEnrollmentOpen, setIsEnrollmentOpen] = useState<boolean>(false);
@@ -36,6 +39,15 @@ export default function GamePage({
   const endEnrollmentDate = useAtomValue(enrollmentEndDateAtom)!
   const startEditionDate = useAtomValue(editionStartDateAtom)!;
   const [showAIModal, setShowAIModal] = useState(false);
+
+  useEffect(() => {
+    if (generatingTournamentLoader) {
+      const interval = setInterval(() => {
+        setProgress((prev) => (prev < 90 ? prev + 10 : prev));
+      }, 300);
+      return () => clearInterval(interval);
+    }
+  }, [generatingTournamentLoader]);
 
   // Fetch game details by name
   useEffect(() => {
@@ -227,6 +239,7 @@ export default function GamePage({
     }
 
     try {
+      setGeneratingTournamentLoader(true);
       const res = await fetch(`/api/tournament/${event.id}/setup/${startEditionDate}`, {
         method: 'POST',
       });
@@ -248,6 +261,7 @@ export default function GamePage({
       checkIfTournamentOpen();
       router.push(`/tournament/${slugify(game?.name)}`);
     } catch (error) {
+      setGeneratingTournamentLoader(false);
       console.error('Failed during handling with error:', error);
     }
   };
@@ -282,6 +296,15 @@ export default function GamePage({
     );
   }
 
+  if (generatingTournamentLoader) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <p className="text-gray-500 text-lg mb-4">Generating Tournament...</p>
+        <Progress value={progress} className="w-64" />
+      </div>
+    );
+  }
+
   if (error) {
     return <div className="text-center text-red-600">{error}</div>;
   }
@@ -307,6 +330,7 @@ export default function GamePage({
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-3xl font-bold">Leaderboard</h2>
           <div className="flex gap-2">
+            {/* TODO: use admin roles from player interface instead */}
             {(selectedUsername?.toLowerCase() === "mukul" || selectedUsername?.toLowerCase() === "nina") && (
               <Button
                 className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2"
