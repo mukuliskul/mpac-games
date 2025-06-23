@@ -19,7 +19,10 @@ export async function GET(
 
   let query = supabase
     .from('game_sessions')
-    .select('*');
+    .select(`
+    *,
+    event:event_id ( game_name )
+  `); // join on event_id to get event.game_name
 
   if (filterUpcoming) {
     const today = getCurrentNYDateString();
@@ -41,6 +44,7 @@ export async function GET(
     round: row.round,
     date: row.match_date,
     winner: row.winner_username,
+    game_name: row.event?.game_name ?? null, // add event name here
   }));
 
   return NextResponse.json({ sessions });

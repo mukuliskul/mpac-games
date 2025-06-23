@@ -1,5 +1,6 @@
-import { DaysOfWeek, EventStatus, GameMode, Role, TeamName } from "./enums";
+import { DaysOfWeek, GameMode, Role, TeamName } from "./enums";
 
+// TODO: use camelCase in all interfaces
 export interface Game {
   id: string;
   name: string;
@@ -24,8 +25,6 @@ export interface Event {
   game_name: string;
   enrolled_count: number;
   edition: string;
-  start_date: string;
-  event_status: EventStatus;
 }
 
 export interface Enrollment {
@@ -48,6 +47,7 @@ export interface Match {
   round: number;
   date: string;
   winner: string | null;
+  game_name?: string | null;
 }
 
 export interface Leaderboard {

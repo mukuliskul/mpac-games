@@ -1,4 +1,3 @@
-import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Match } from "@/lib/types/interfaces";
 import { useAtomValue } from "jotai";
@@ -11,14 +10,9 @@ const UpcomingMatchesTable = ({
   matches: Match[]
 }) => {
   const selectedUsername = useAtomValue(usernameAtom);
-  console.log("UpcomingMatchesTable matches:", matches);
 
   const upcomingMatches = matches
-    .filter(match => match.winner === null)
-    .sort(
-      (a, b) =>
-        new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
+    .filter(match => match.winner === null && match.player1 !== "BYE" && match.player2 !== "BYE");
 
   if (upcomingMatches.length === 0) {
     return (
@@ -34,11 +28,12 @@ const UpcomingMatchesTable = ({
         <TableRow>
           <TableHead className="w-24">Date</TableHead>
           <TableHead>Match</TableHead>
+          <TableHead className="text-center">Game</TableHead> {/* new column */}
           <TableHead className="w-20 text-center">Round</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {upcomingMatches.map(({ id, player1, player2, round, date }) => {
+        {upcomingMatches.map(({ id, player1, player2, round, date, game_name }) => {
           const isUserInMatch = selectedUsername === player1 || selectedUsername === player2;
           const matchLabel = (
             <>
@@ -59,6 +54,7 @@ const UpcomingMatchesTable = ({
             >
               <TableCell className="font-medium">{date}</TableCell>
               <TableCell>{matchLabel}</TableCell>
+              <TableCell className="text-center">{game_name}</TableCell>
               <TableCell className="text-center">{round}</TableCell>
             </TableRow>
           );
