@@ -3,7 +3,7 @@
 import { useAtomValue } from "jotai";
 import { currentEditionAtom } from "@/state/editionAtom";
 import { usernameAtom } from "@/state/usernameAtom";
-import { useEffect, useState, useCallback, use } from "react";
+import { useEffect, useState, useCallback, use, useRef } from "react";
 import type { Event, Match } from "@/lib/types/interfaces";
 import { Spinner } from "@/components/ui/spinner";
 import { PlayerCard } from "@/components/PlayerCard";
@@ -21,9 +21,62 @@ export default function TournamentPage({
   const currentEdition = useAtomValue(currentEditionAtom)!;
   const selectedUsername = useAtomValue(usernameAtom);
   const initialPlayerCount = rounds[0]?.length * 2 || 0;
+  const processedMatches = useRef(new Set<string>());
+
+  useEffect(() => {
+    async function fetchEvent() {
+      if (!currentEdition) return;
+
+      try {
+        const response = await fetch(`/api/event?gameName=${name}&edition=${currentEdition}`);
+        if (!response.ok) throw new Error("Failed to fetch event");
+
+        const data = await response.json();
+        if (!data || Object.keys(data).length === 0) {
+          setError("Event not found.");
+          return;
+        }
+
+        setEvent(data);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch event.");
+      }
+    }
+
+    fetchEvent();
+  }, [name, currentEdition]);
+
+  const fetchRounds = useCallback(async () => {
+    if (!event) return;
+
+    const fetchedRounds: Match[][] = [];
+    let round = 1;
+
+    while (true) {
+      const response = await fetch(`/api/game-session/event/${event.id}/${round}`);
+
+      if (!response.ok) {
+        break;
+      }
+
+      const matchesData: Match[] = await response.json();
+      if (!matchesData || matchesData.length === 0) break;
+
+      fetchedRounds.push(matchesData);
+      round++;
+    }
+
+    setRounds(fetchedRounds);
+    setLoading(false);
+  }, [event]);
+
+  useEffect(() => {
+    fetchRounds();
+  }, [fetchRounds]);
 
   //TODO: test with 5 enrolled players
-  const handleSetWinner = async (
+  const handleSetWinner = useCallback(async (
     matchId: string,
     player: string,
     roundIndex: number,
@@ -68,59 +121,47 @@ export default function TournamentPage({
     } catch (err) {
       console.error("Error setting winner", err);
     }
-  };
+  }, [event, rounds, fetchRounds]);
 
-  const fetchRounds = useCallback(async () => {
-    if (!event) return;
+  const autoResolveByeMatch = useCallback(
+    async (match: Match, roundIndex: number, idx: number) => {
+      const { player1, player2, winner, id: matchId } = match;
 
-    const fetchedRounds: Match[][] = [];
-    let round = 1;
+      if (!matchId) return;
+      if (winner) return;
+      if (processedMatches.current.has(matchId)) return;  // Skip if already processed
 
-    while (true) {
-      const response = await fetch(`/api/game-session/event/${event.id}/${round}`);
+      const isBye1 = player1 === "BYE";
+      const isBye2 = player2 === "BYE";
 
-      if (!response.ok) {
-        break;
-      }
+      if (!isBye1 && !isBye2) return;
 
-      const matchesData: Match[] = await response.json();
-      if (!matchesData || matchesData.length === 0) break;
+      const autoWinner = isBye1 && !isBye2 ? player2! :
+        isBye2 && !isBye1 ? player1! :
+          "BYE";
 
-      fetchedRounds.push(matchesData);
-      round++;
-    }
+      processedMatches.current.add(matchId);  // Mark as processed BEFORE awaiting
 
-    setRounds(fetchedRounds);
-    setLoading(false);
-  }, [event]);
+      await handleSetWinner(matchId, autoWinner, roundIndex, idx);
+    },
+    [handleSetWinner]
+  );
 
   useEffect(() => {
-    async function fetchEvent() {
-      if (!currentEdition) return;
+    if (!rounds.length) return;
 
-      try {
-        const response = await fetch(`/api/event?gameName=${name}&edition=${currentEdition}`);
-        if (!response.ok) throw new Error("Failed to fetch event");
-
-        const data = await response.json();
-        if (!data || Object.keys(data).length === 0) {
-          setError("Event not found.");
-          return;
+    const resolveAllByes = async () => {
+      for (let roundIndex = 0; roundIndex < rounds.length; roundIndex++) {
+        const matches = rounds[roundIndex];
+        for (let idx = 0; idx < matches.length; idx++) {
+          const match = matches[idx];
+          await autoResolveByeMatch(match, roundIndex, idx);
         }
-
-        setEvent(data);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to fetch event.");
       }
-    }
+    };
 
-    fetchEvent();
-  }, [name, currentEdition]);
-
-  useEffect(() => {
-    fetchRounds();
-  }, [fetchRounds]);
+    resolveAllByes();
+  }, [rounds, autoResolveByeMatch]);
 
   if (loading) {
     return (
