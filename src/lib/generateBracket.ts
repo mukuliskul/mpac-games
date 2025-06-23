@@ -14,17 +14,15 @@ export async function generateFirstRound(
   const players = await getEnrolledPlayers(eventId);
   if (players.length < 2) throw new Error("Not enough players");
 
-  // TODO: perform shuffle after adding BYE
-  const shuffled = [...players].sort(() => Math.random() - 0.5);
-  const targetCount = Math.pow(2, Math.ceil(Math.log2(shuffled.length)));
-
   // Fetch the real BYE player from the DB
   const byePlayer = await getByePlayer();
-  while (shuffled.length < targetCount) {
-    shuffled.push(byePlayer);
+
+  const targetCount = Math.pow(2, Math.ceil(Math.log2(players.length)));
+  while (players.length < targetCount) {
+    players.push(byePlayer);
   }
 
-  console.log("Shuffled players:", shuffled.map(p => p.username));
+  const shuffled = [...players].sort(() => Math.random() - 0.5);
 
   const editionStartDateObjConst = parseNYDateString(editionStartDate);
   let editionStartDateObj = editionStartDateObjConst;
