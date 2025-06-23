@@ -32,16 +32,23 @@ export async function GET(
     return new Response("Error fetching data", { status: 500 });
   }
 
-  const matches = (data ?? []).map(row => {
-    const match: Match = {
-      id: row.id,
-      player1: row.player1_username,
-      player2: row.player2_username,
-      round: row.round,
-      date: row.match_date,
-      winner: row.winner_username,
-    };
-    return match;
+  const matches = (data ?? []).map(row => ({
+    id: row.id,
+    player1: row.player1_username,
+    player2: row.player2_username,
+    round: row.round,
+    date: row.match_date,
+    winner: row.winner_username,
+  }));
+
+  // Sort so that matches with BYE appear first
+  matches.sort((a, b) => {
+    const aIsBye = a.player1 === 'BYE' || a.player2 === 'BYE';
+    const bIsBye = b.player1 === 'BYE' || b.player2 === 'BYE';
+
+    if (aIsBye && !bIsBye) return -1;
+    if (!aIsBye && bIsBye) return 1;
+    return 0; // maintain original order
   });
 
   return new Response(JSON.stringify(matches), {
