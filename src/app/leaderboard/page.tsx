@@ -37,7 +37,7 @@ export default function AggregateLeaderboard() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
+      <div className="w-full h-full flex items-center justify-center overflow-hidden">
         <Spinner />;
       </div>
     );
