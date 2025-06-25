@@ -4,6 +4,7 @@ import "./globals.css";
 import NavBarWrapper from "@/components/NavBarWrapper";
 import UsernameRedirector from "@/components/UsernameRedirector";
 import AppInitializer from "@/components/AppInitializer";
+import SupportWidgetWrapper from "@/components/SupportWidgetWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +34,7 @@ export default function RootLayout({
         <AppInitializer />
         <UsernameRedirector />
         <NavBarWrapper />
+        <SupportWidgetWrapper />
         {children}
       </body>
     </html>
