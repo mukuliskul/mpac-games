@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useAtomValue } from 'jotai';
 import { usernameAtom } from '@/state/usernameAtom';
@@ -9,15 +9,43 @@ const SupportChat = () => {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<string[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
   const selectedUsername = useAtomValue(usernameAtom);
+
+  const chatRef = useRef<HTMLDivElement | null>(null);
 
   const toggleOpen = () => setOpen(!open);
 
   const handleSend = () => {
-    if (!input.trim()) return;
-    setMessages([...messages, `You: ${input}`, `Support: Hi ${selectedUsername}, looking into it and will provide an update shortly. Thank you.`]);
+    if (!input.trim() || isTyping) return;
+    setMessages([...messages, `You: ${input}`]);
     setInput('');
+    setIsTyping(true);
+
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        `Support: Hi ${selectedUsername}, looking into it and will provide an update shortly. Thank you.`,
+      ]);
+      setIsTyping(false);
+    }, 1500);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (chatRef.current && !chatRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [open]);
 
   return (
     <>
@@ -55,6 +83,7 @@ const SupportChat = () => {
       {/* Chat Box */}
       {open && (
         <div
+          ref={chatRef}
           style={{
             position: 'fixed',
             bottom: 90,
@@ -78,14 +107,52 @@ const SupportChat = () => {
               fontSize: 14,
             }}
           >
-            {messages.length === 0 && (
+            {messages.length === 0 && !isTyping && (
               <p style={{ color: '#666' }}>How can I help you today?</p>
             )}
+
             {messages.map((msg, idx) => (
               <p key={idx} style={{ margin: '4px 0' }}>
                 {msg}
               </p>
             ))}
+
+            {isTyping && (
+              <div style={{ display: 'flex', alignItems: 'center', marginTop: 8 }}>
+                <div
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: '50%',
+                    backgroundColor: '#0070f3',
+                    marginRight: 4,
+                    animation: 'blink 1.4s infinite both',
+                    animationDelay: '0s',
+                  }}
+                />
+                <div
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: '50%',
+                    backgroundColor: '#0070f3',
+                    marginRight: 4,
+                    animation: 'blink 1.4s infinite both',
+                    animationDelay: '0.2s',
+                  }}
+                />
+                <div
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: '50%',
+                    backgroundColor: '#0070f3',
+                    animation: 'blink 1.4s infinite both',
+                    animationDelay: '0.4s',
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           <div style={{ display: 'flex', padding: 8 }}>
@@ -95,6 +162,7 @@ const SupportChat = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Type here..."
+              disabled={isTyping}
               style={{
                 flexGrow: 1,
                 padding: '6px 8px',
@@ -106,6 +174,7 @@ const SupportChat = () => {
             />
             <button
               onClick={handleSend}
+              disabled={isTyping}
               style={{
                 marginLeft: 8,
                 padding: '6px 12px',
@@ -119,6 +188,17 @@ const SupportChat = () => {
               Send
             </button>
           </div>
+
+          <style jsx>{`
+            @keyframes blink {
+              0%, 80%, 100% {
+                opacity: 0.3;
+              }
+              40% {
+                opacity: 1;
+              }
+            }
+          `}</style>
         </div>
       )}
     </>
