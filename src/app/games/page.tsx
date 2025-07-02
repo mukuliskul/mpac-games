@@ -44,7 +44,7 @@ const GamesPage = () => {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center overflow-hidden">
+      <div className="flex flex-col items-center justify-center h-screen">
         <p className="text-gray-500 text-lg mb-4">Loading games...</p>
         <Progress value={progress} className="w-64" />
       </div>
