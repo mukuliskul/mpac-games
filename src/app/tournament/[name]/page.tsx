@@ -270,6 +270,7 @@ export default function TournamentPage({
                                   isInMatch={true}
                                   isUser={match.player1 === selectedUsername}
                                   onSetWinner={() => handleSetWinner(match.id, match.player1!, roundIndex, idx)}
+                                  onReschedule={() => handleReschedule(match.id)}
                                 />
                                 <PlayerCard
                                   player={match.player2}
@@ -277,18 +278,9 @@ export default function TournamentPage({
                                   isInMatch={true}
                                   isUser={match.player2 === selectedUsername}
                                   onSetWinner={() => handleSetWinner(match.id, match.player2!, roundIndex, idx)}
+                                  onReschedule={() => handleReschedule(match.id)}
                                 />
                                 <div className="text-[11px] text-gray-400 text-center mt-1">{match.date}</div>
-
-                                {/* Reschedule Button */}
-                                {(selectedUsername?.toLowerCase() === "mukul" || selectedUsername?.toLowerCase() === "nina") && (
-                                  <button
-                                    onClick={() => handleReschedule(match.id)}
-                                    className="text-xs text-blue-500 hover:underline self-center"
-                                  >
-                                    Reschedule
-                                  </button>
-                                )}
                               </div>
                             ) : (
                               <>
