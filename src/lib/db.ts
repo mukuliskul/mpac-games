@@ -1,3 +1,5 @@
+import { formatToNYDateString, getCurrentNYDateTime } from './date';
+import { findNextAvailableDate } from './generateBracket';
 import { supabase } from './supabase';
 import { EventStatus } from './types/enums';
 import { Match, Player } from './types/interfaces';
@@ -58,7 +60,47 @@ export async function updateWinner(
   }
 }
 
+export async function rescheduleGame(
+  gameSessionId: string,
+): Promise<void> {
+  const { data, error: fetchError } = await supabase
+    .from('game_sessions')
+    .select('*')
+    .eq('id', gameSessionId)
+    .single();
 
+  if (fetchError || !data) throw fetchError;
+
+  const match: Match = {
+    id: data.id,
+    player1: data.player1_username,
+    player2: data.player2_username,
+    round: data.round,
+    date: data.match_date,
+    winner: data.winner_username,
+  };
+
+  const player1 = await getPlayerByUsername(match.player1);
+  const player2 = await getPlayerByUsername(match.player2);
+
+  // Find next available date for the match
+  const currentDate = getCurrentNYDateTime();
+  const nextDate = await findNextAvailableDate(
+    player1,
+    player2,
+    formatToNYDateString(currentDate),
+    data.eventId,
+  );
+
+  const { error } = await supabase
+    .from('game_sessions')
+    .update({ date: nextDate })
+    .eq('id', gameSessionId);
+
+  if (error) {
+    throw new Error(`Failed to update date: ${error.message}`);
+  }
+}
 
 
 export async function getEnrolledPlayers(eventId: string): Promise<Player[]> {
