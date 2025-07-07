@@ -1,4 +1,4 @@
-import { rescheduleDate, rescheduleGame, updateDate, updateWinner } from "@/lib/db";
+import { rescheduleGame, updateWinner } from "@/lib/db";
 
 /**
  * PUT /api/game-session/[gameSessionId]/
