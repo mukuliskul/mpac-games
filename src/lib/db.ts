@@ -89,12 +89,12 @@ export async function rescheduleGame(
     player1,
     player2,
     formatToNYDateString(currentDate),
-    data.eventId,
+    data.event_id, // TODO: include it in the match object
   );
 
   const { error } = await supabase
     .from('game_sessions')
-    .update({ date: nextDate })
+    .update({ match_date: nextDate })
     .eq('id', gameSessionId);
 
   if (error) {

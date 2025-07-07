@@ -125,6 +125,31 @@ export default function TournamentPage({
     }
   }, [event, rounds, fetchRounds]);
 
+  const handleReschedule = useCallback(
+    async (matchId: string) => {
+      if (!matchId || !event) return;
+
+      try {
+        const response = await fetch(`/api/game-session/${matchId}?reschedule=true`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          console.error("Failed to reschedule match");
+          return;
+        }
+
+        await fetchRounds(); // Refresh state
+      } catch (err) {
+        console.error("Error rescheduling match", err);
+      }
+    },
+    [event, fetchRounds]
+  );
+
   const autoResolveByeMatch = useCallback(
     async (match: Match, roundIndex: number, idx: number) => {
       const { player1, player2, winner, id: matchId } = match;
@@ -246,7 +271,6 @@ export default function TournamentPage({
                                   isUser={match.player1 === selectedUsername}
                                   onSetWinner={() => handleSetWinner(match.id, match.player1!, roundIndex, idx)}
                                 />
-
                                 <PlayerCard
                                   player={match.player2}
                                   matchWinner={match.winner}
@@ -255,6 +279,16 @@ export default function TournamentPage({
                                   onSetWinner={() => handleSetWinner(match.id, match.player2!, roundIndex, idx)}
                                 />
                                 <div className="text-[11px] text-gray-400 text-center mt-1">{match.date}</div>
+
+                                {/* Reschedule Button */}
+                                {(selectedUsername?.toLowerCase() === "mukul" || selectedUsername?.toLowerCase() === "nina") && (
+                                  <button
+                                    onClick={() => handleReschedule(match.id)}
+                                    className="text-xs text-blue-500 hover:underline self-center"
+                                  >
+                                    Reschedule
+                                  </button>
+                                )}
                               </div>
                             ) : (
                               <>
