@@ -196,19 +196,21 @@ export default function GamePage({
   // Fetch leaderboard for the game
   const fetchLeaderboard = useCallback(async () => {
     setLoading(true);
-    try {
-      const response = await fetch(`/api/leaderboard?game=${name}`);
-      if (!response.ok) throw new Error("Failed to fetch leaderboard");
+    if (event) {
+      try {
+        const response = await fetch(`/api/leaderboard?eventId=${event.id}`);
+        if (!response.ok) throw new Error("Failed to fetch leaderboard");
 
-      const data = await response.json();
-      setLeaderboard(data);
-    } catch (err) {
-      console.error(err);
-      setError('Failed to fetch leaderboard.');
-    } finally {
-      setLoading(false);
+        const data = await response.json();
+        setLeaderboard(data);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to fetch leaderboard.');
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [name]);
+  }, [event]);
 
   useEffect(() => {
     fetchLeaderboard();

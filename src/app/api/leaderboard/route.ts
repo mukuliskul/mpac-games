@@ -2,15 +2,14 @@ import { supabase } from "@/lib/supabase";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const game = url.searchParams.get("game");
+  const eventId = url.searchParams.get("eventId");
+  console.log("Fetching leaderboards for eventId:", eventId);
 
-  if (game) {
-    const formattedGame = game.replace(/-/g, " ");
-
+  if (eventId) {
     const { data: leaderboards, error } = await supabase
       .from("leaderboards")
       .select("username, total_wins:wins, last_updated:updated_at")
-      .ilike("game_name", formattedGame)
+      .eq("event_id", eventId)
 
     if (error) {
       console.error("Error fetching leaderboards:", error);
