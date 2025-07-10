@@ -18,7 +18,7 @@ export async function getByePlayer(): Promise<Player> {
 
 export async function getEventStatus(eventId: string): Promise<EventStatus> {
   const { data, error } = await supabase
-    .from('event')
+    .from('events')
     .select('event_status')
     .eq('id', eventId)
     .single();

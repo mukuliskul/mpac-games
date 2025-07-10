@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   const formattedName = gameName.replace(/-/g, " ");
 
   const { data, error } = await supabase
-    .from("event")
+    .from("events")
     .select("*")
     .ilike("game_name", formattedName)
     .eq("edition", edition)
