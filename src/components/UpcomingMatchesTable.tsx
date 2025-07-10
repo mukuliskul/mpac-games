@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Match } from "@/lib/types/interfaces";
 import { useAtomValue } from "jotai";
 import { usernameAtom } from "@/state/usernameAtom";
+import { getCurrentNYDateString } from "@/lib/date";
 
 
 const UpcomingMatchesTable = ({
@@ -32,16 +33,46 @@ const UpcomingMatchesTable = ({
       <TableBody>
         {upcomingMatches.map(({ id, player1, player2, round, date, game_name }) => {
           const isUserInMatch = selectedUsername === player1 || selectedUsername === player2;
+          const isToday = date === getCurrentNYDateString();
           const matchLabel = (
             <>
-              <span className={player1 === selectedUsername ? "font-semibold text-yellow-700" : ""}>{player1}</span>{" "}
+              <span
+                className={[
+                  player1 === selectedUsername
+                    ? isToday
+                      ? "font-semibold text-gray-900"
+                      : "font-semibold text-yellow-700"
+                    : "",
+                ].filter(Boolean).join(" ")}
+              >
+                {player1}
+              </span>{" "}
               <span className="text-gray-400">vs</span>{" "}
-              <span className={player2 === selectedUsername ? "font-semibold text-yellow-700" : ""}>{player2}</span>
+              <span
+                className={[
+                  player2 === selectedUsername
+                    ? isToday
+                      ? "font-semibold text-gray-900"
+                      : "font-semibold text-yellow-700"
+                    : "",
+                ].filter(Boolean).join(" ")}
+              >
+                {player2}
+              </span>
             </>
           );
 
           return (
-            <TableRow key={id} className={isUserInMatch ? "bg-yellow-50 hover:bg-yellow-100 transition" : ""}>
+            <TableRow
+              key={id}
+              className={[
+                isToday
+                  ? "bg-gray-100 hover:bg-gray-200 transition"
+                  : isUserInMatch
+                    ? "bg-yellow-50 hover:bg-yellow-100 transition"
+                    : "",
+              ].filter(Boolean).join(" ")}
+            >
               <TableCell className="font-medium">{date}</TableCell><TableCell>{matchLabel}</TableCell><TableCell className="text-center">{game_name}</TableCell><TableCell className="text-center">{round}</TableCell>
             </TableRow>
           );

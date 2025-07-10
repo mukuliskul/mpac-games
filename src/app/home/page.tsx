@@ -52,7 +52,6 @@ const Homepage = () => {
           throw new Error("Failed to fetch matches");
         }
         const data = await response.json();
-        console.log(data.sessions);
         setMatches(data.sessions);
       } catch (err) {
         console.error(err);
