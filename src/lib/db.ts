@@ -226,6 +226,12 @@ export async function insertGameSession(params: {
 }): Promise<void> {
   const { eventId, round, matchDate, player1, player2, winner } = params;
 
+  // const { data } = await supabase
+  //   .from('events')
+  //   .select('event_name')
+  //   .eq('id', eventId)
+  //   .single();
+
   const { error } = await supabase
     .from('game_sessions')
     .insert({
@@ -235,6 +241,7 @@ export async function insertGameSession(params: {
       player1_username: player1,
       player2_username: player2,
       winner_username: winner ?? null,
+      // event_name: data?.event_name || null, //TODO: make sure this works
     });
 
   if (error) throw new Error(`Error inserting match: ${error.message}`);
